@@ -36,7 +36,7 @@ namespace Overlay
                 });
             };
 
-            _ = _loop.StartAsync(3в);
+            _ = _loop.StartAsync(3);
         }
 
         protected override void OnExit(ExitEventArgs e)

@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace Overlay
 {
@@ -10,12 +11,19 @@ namespace Overlay
 
             Task.Run(async () =>
             {
-                await Task.Delay(3000);
-
-                Dispatcher.Invoke(() =>
+                this.Loaded += async (s, e) =>
                 {
-                    Close();
-                });
+                    for (int i = 1; i <= 12; i++)
+                    {
+                        JumpscareImage.Source = new BitmapImage(new Uri($"pack://application:,,,/Assets/{i}.png"));
+                        await Task.Delay(40);
+                    }
+
+                    Dispatcher.Invoke(() =>
+                    {
+                        Close();
+                    });
+                };
             });
         }
     }
