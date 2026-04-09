@@ -1,7 +1,8 @@
 ﻿<Application x:Class="Overlay.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:Overlay">
+             xmlns:local="clr-namespace:Overlay"
+             ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
 
     </Application.Resources>
