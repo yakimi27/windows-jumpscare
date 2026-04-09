@@ -1,0 +1,21 @@
+<Window x:Class="Overlay.JumpscareWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Overlay"
+        mc:Ignorable="d"
+        Title="MainWindow"
+        Height="{x:Static SystemParameters.PrimaryScreenHeight}"
+        Width="{x:Static SystemParameters.PrimaryScreenWidth}"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        Topmost="True">
+    <Window.Background>
+        <SolidColorBrush Opacity="0" Color="White"/>
+    </Window.Background>
+    <Grid>
+        <Image Name="JumpscareImage" Source="C:\Users\Admin\Desktop\d.jpg" Stretch="UniformToFill"/>
+    </Grid>
+</Window>
