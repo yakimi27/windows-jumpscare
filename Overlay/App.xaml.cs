@@ -8,10 +8,13 @@ namespace Overlay
     {
         private Loop _loop = new Loop();
         private NotifyIcon _trayIcon;
+        private readonly FrameCache _frameCache = new FrameCache();
 
         protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            _frameCache.Preload(12);
 
             _trayIcon = new NotifyIcon
             {
@@ -31,7 +34,7 @@ namespace Overlay
             {
                 Dispatcher.Invoke(() =>
                 {
-                    var jumpscareWindow = new JumpscareWindow();
+                    var jumpscareWindow = new JumpscareWindow(_frameCache.Frames);
                     jumpscareWindow.Show();
                 });
             };

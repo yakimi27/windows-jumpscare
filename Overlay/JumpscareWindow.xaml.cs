@@ -5,26 +5,24 @@ namespace Overlay
 {
     public partial class JumpscareWindow : Window
     {
-        public JumpscareWindow()
+        private readonly IReadOnlyList<BitmapImage> _frames;
+        public JumpscareWindow(IReadOnlyList<BitmapImage> frames)
         {
             InitializeComponent();
+            _frames = frames;
+            JumpscareImage.Source = _frames[0];
+            Loaded += OnWindowLoaded;
+        }
 
-            Task.Run(async () =>
+        private async void OnWindowLoaded(object sender, RoutedEventArgs e)
+        {
+            foreach (BitmapImage frame in _frames)
             {
-                this.Loaded += async (s, e) =>
-                {
-                    for (int i = 1; i <= 12; i++)
-                    {
-                        JumpscareImage.Source = new BitmapImage(new Uri($"pack://application:,,,/Assets/{i}.png"));
-                        await Task.Delay(40);
-                    }
+                JumpscareImage.Source = frame;
+                await Task.Delay(100);
+            }
 
-                    Dispatcher.Invoke(() =>
-                    {
-                        Close();
-                    });
-                };
-            });
+            Close();
         }
     }
 }
