@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Threading;
 
 namespace Overlay
 {
@@ -14,12 +15,14 @@ namespace Overlay
             Visibility = Visibility.Hidden;
         }
 
-        internal async void PlayAndHide(byte frequency)
+        internal async Task PlayAndHide(byte frequency)
         {
-            if (_isPlaying) return;
             _isPlaying = true;
 
             var frames = _cache.Acquire();
+            JumpscareImage.Source = frames[0];
+            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render);
+
             Visibility = Visibility.Visible;
 
             foreach (var frame in frames)
@@ -29,9 +32,12 @@ namespace Overlay
             }
 
             JumpscareImage.Source = null;
-            Visibility = Visibility.Hidden;
+            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render);
+            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
+
             _cache.Release();
             _isPlaying = false;
+            // caller does  close + null after this returns
         }
     }
 }

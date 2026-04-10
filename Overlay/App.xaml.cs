@@ -1,4 +1,5 @@
 ﻿using Core;
+using System.Runtime.InteropServices;
 using System.Windows;
 
 
@@ -12,7 +13,18 @@ namespace Overlay
         private JumpscareWindow? _jumpscareWindow;
 
         private const byte _frameFrequency = 60; //milliseconds
-        private const ushort _jumpscareChance = 3; //max value 65535
+        private const ushort _jumpscareChance = 100; //max value 65535
+
+        [DllImport("kernel32.dll")]
+        private static extern bool SetProcessWorkingSetSize(IntPtr handle, IntPtr minSize, IntPtr maxSize);
+
+        private void TrimWorkingSet()
+        {
+            SetProcessWorkingSetSize(
+                System.Diagnostics.Process.GetCurrentProcess().Handle,
+                (IntPtr)(-1),
+                (IntPtr)(-1));
+        }
 
         protected override async void OnStartup(StartupEventArgs e)
         {
@@ -35,9 +47,18 @@ namespace Overlay
 
             _loop.OnTriggered += () =>
             {
-                Dispatcher.Invoke(() =>
+                Dispatcher.Invoke(async () =>
                 {
-                    _jumpscareWindow.PlayAndHide(_frameFrequency);
+                    var window = new JumpscareWindow(_frameCache);
+                    await window.PlayAndHide(_frameFrequency);
+
+                    window.Close();
+                    window = null;
+
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    GC.Collect();
+                    TrimWorkingSet();
                 });
             };
 
