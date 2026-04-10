@@ -1,28 +1,37 @@
 ﻿using System.Windows;
-using System.Windows.Media.Imaging;
 
 namespace Overlay
 {
     public partial class JumpscareWindow : Window
     {
-        private readonly IReadOnlyList<BitmapImage> _frames;
-        public JumpscareWindow(IReadOnlyList<BitmapImage> frames)
+        private readonly FrameCache _cache;
+        private bool _isPlaying = false;
+
+        internal JumpscareWindow(FrameCache cache)
         {
             InitializeComponent();
-            _frames = frames;
-            JumpscareImage.Source = _frames[0];
-            Loaded += OnWindowLoaded;
+            _cache = cache;
+            Visibility = Visibility.Hidden;
         }
 
-        private async void OnWindowLoaded(object sender, RoutedEventArgs e)
+        internal async void PlayAndHide(byte frequency)
         {
-            foreach (BitmapImage frame in _frames)
+            if (_isPlaying) return;
+            _isPlaying = true;
+
+            var frames = _cache.Acquire();
+            Visibility = Visibility.Visible;
+
+            foreach (var frame in frames)
             {
                 JumpscareImage.Source = frame;
-                await Task.Delay(100);
+                await Task.Delay(frequency);
             }
 
-            Close();
+            JumpscareImage.Source = null;
+            Visibility = Visibility.Hidden;
+            _cache.Release();
+            _isPlaying = false;
         }
     }
 }
