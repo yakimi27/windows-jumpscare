@@ -8,13 +8,15 @@ namespace Overlay
     {
         private Loop _loop = new Loop();
         private NotifyIcon _trayIcon;
-        private readonly FrameCache _frameCache = new FrameCache();
+        private readonly FrameCache _frameCache = new FrameCache(15, "withered_foxy", decodeWidth: 600);
+        private JumpscareWindow? _jumpscareWindow;
+
+        private const byte _frameFrequency = 60; //milliseconds
+        private const ushort _jumpscareChance = 3; //max value 65535
 
         protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
-            _frameCache.Preload(12);
 
             _trayIcon = new NotifyIcon
             {
@@ -27,19 +29,19 @@ namespace Overlay
             contextMenu.Items.Add("Show", null, (s, args) => ShowMainWindow());
             contextMenu.Items.Add("Exit", null, (s, args) => Shutdown());
             _trayIcon.ContextMenuStrip = contextMenu;
-
             _trayIcon.DoubleClick += (s, args) => ShowMainWindow();
+
+            _jumpscareWindow = new JumpscareWindow(_frameCache);
 
             _loop.OnTriggered += () =>
             {
                 Dispatcher.Invoke(() =>
                 {
-                    var jumpscareWindow = new JumpscareWindow(_frameCache.Frames);
-                    jumpscareWindow.Show();
+                    _jumpscareWindow.PlayAndHide(_frameFrequency);
                 });
             };
 
-            _ = _loop.StartAsync(3);
+            _ = _loop.StartAsync(_jumpscareChance);
         }
 
         protected override void OnExit(ExitEventArgs e)
