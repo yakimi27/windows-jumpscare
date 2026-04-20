@@ -112,7 +112,9 @@
 		<Resource Include="Assets\withered_foxy\9.png">
 		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
-		<Resource Include="Assets\withered_foxy\foxy_scream.wav" />
+		<Content Include="Assets\withered_foxy\foxy_scream.wav">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 		<Resource Include="Assets\withered_freddy\1.png" />
 		<Resource Include="Assets\withered_freddy\10.png" />
 		<Resource Include="Assets\withered_freddy\11.png" />

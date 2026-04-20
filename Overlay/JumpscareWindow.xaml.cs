@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Windows;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace Overlay
@@ -7,12 +9,20 @@ namespace Overlay
     {
         private readonly FrameCache _cache;
         private bool _isPlaying = false;
+        private MediaPlayer _screamSound = new MediaPlayer();
 
         internal JumpscareWindow(FrameCache cache)
         {
             InitializeComponent();
             _cache = cache;
             Visibility = Visibility.Hidden;
+
+            var soundPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                "Assets/withered_foxy/foxy_scream.wav");
+            if (File.Exists(soundPath))
+            {
+                _screamSound.Open(new Uri(soundPath));
+            }
         }
 
         internal async Task PlayAndHide(byte frequency)
@@ -24,6 +34,8 @@ namespace Overlay
             await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render);
 
             Visibility = Visibility.Visible;
+
+            _ = PlaySound();
 
             foreach (var frame in frames)
             {
@@ -38,6 +50,13 @@ namespace Overlay
             _cache.Release();
             _isPlaying = false;
             // caller does  close + null after this returns
+        }
+
+        private async Task PlaySound()
+        {
+            _screamSound.Play();
+            await Task.Delay((int)_screamSound.NaturalDuration.TimeSpan.TotalMilliseconds);
+            _screamSound.Stop();
         }
     }
 }
