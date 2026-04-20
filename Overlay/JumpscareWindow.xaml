@@ -11,7 +11,8 @@
         AllowsTransparency="True"
         WindowStyle="None"
         WindowStartupLocation="CenterScreen"
-        Topmost="True">
+        Topmost="True"
+        ShowInTaskbar="False">
     <Window.Background>
         <SolidColorBrush Opacity="0" Color="White"/>
     </Window.Background>
