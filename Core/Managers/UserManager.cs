@@ -15,10 +15,17 @@ namespace Core.Managers
         }
 
         public ushort GetJumpscareChance() => _userModel.JumpscareChance;
+        public string GetSelectedJumpscare() => _userModel.SelectedJumpscare;
 
         public void SetJumpscareChance(ushort chance)
         {
             _userModel.JumpscareChance = chance;
+            Save();
+        }
+
+        public void SetSelectedJumpscare(string jumpscare)
+        {
+            _userModel.SelectedJumpscare = jumpscare;
             Save();
         }
 

@@ -56,14 +56,14 @@ namespace Core.Services
             Directory.CreateDirectory(_appDirectory);
 
             if (!File.Exists(_userConfigFilePath))
-                Save(_userConfigFilePath, new UserModel { JumpscareChance = 10000 });
+                Save(_userConfigFilePath, new UserModel());
 
             if (!File.Exists(_jumpscareConfigFilePath))
                 Save(_jumpscareConfigFilePath, new JumpscareModel.JumpscareList
                 {
                     Jumpscares = [
-                        new () {Name= "Withered Foxy", AssetsPath= "assets/withered_foxy", FrameAmount = 15, FrameFrequency= 60},
-                        new() {Name= "Withered Freddy", AssetsPath= "assets/withered_freddy", FrameAmount = 36, FrameFrequency= 50}
+                        new () {Name = "Withered Foxy", AssetsPath = "assets/withered_foxy", FrameAmount = 15, FrameFrequency= 60},
+                        new() {Name = "Withered Freddy", AssetsPath = "assets/withered_freddy", FrameAmount = 36, FrameFrequency= 50}
                         ]
                 });
         }
