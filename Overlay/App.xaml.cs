@@ -13,7 +13,7 @@ namespace Overlay
         private JumpscareWindow? _jumpscareWindow;
 
         private const byte _frameFrequency = 60; //milliseconds
-        private const ushort _jumpscareChance = 100; //max value 65535
+        private const ushort _jumpscareChance = 3;
 
         [DllImport("kernel32.dll")]
         private static extern bool SetProcessWorkingSetSize(IntPtr handle, IntPtr minSize, IntPtr maxSize);

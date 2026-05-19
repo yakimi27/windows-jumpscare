@@ -36,7 +36,7 @@ namespace Core.Managers
         {
             var existing = GetByName(updated.Name) ?? throw new KeyNotFoundException($"Jumpscare '{updated.Name}' not found");
 
-            existing.AssetPath = updated.AssetPath;
+            existing.AssetsPath = updated.AssetsPath;
             existing.FrameAmount = updated.FrameAmount;
             existing.FrameFrequency = updated.FrameFrequency;
             Save();

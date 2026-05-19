@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using Core.ConfigModels;
+using System.Text.Json;
 
 namespace Core.Services
 {
@@ -55,14 +56,16 @@ namespace Core.Services
             Directory.CreateDirectory(_appDirectory);
 
             if (!File.Exists(_userConfigFilePath))
-            {
-                File.WriteAllText(_userConfigFilePath, "{}");
-            }
+                Save(_userConfigFilePath, new UserModel { JumpscareChance = 10000 });
 
             if (!File.Exists(_jumpscareConfigFilePath))
-            {
-                File.WriteAllText(_jumpscareConfigFilePath, "{}");
-            }
+                Save(_jumpscareConfigFilePath, new JumpscareModel.JumpscareList
+                {
+                    Jumpscares = [
+                        new () {Name= "Withered Foxy", AssetsPath= "assets/withered_foxy", FrameAmount = 15, FrameFrequency= 60},
+                        new() {Name= "Withered Freddy", AssetsPath= "assets/withered_freddy", FrameAmount = 36, FrameFrequency= 50}
+                        ]
+                });
         }
     }
 }

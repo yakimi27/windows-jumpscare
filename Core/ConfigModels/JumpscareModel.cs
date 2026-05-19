@@ -9,8 +9,8 @@
         public class Jumpscare
         {
             public string Name { get; set; }
-            public string AssetPath { get; set; }
-            public string FrameAmount { get; set; }
+            public string AssetsPath { get; set; }
+            public byte FrameAmount { get; set; }
             public byte FrameFrequency { get; set; }
         }
     }
