@@ -1,4 +1,7 @@
 ﻿using Core;
+using Core.Interfaces;
+using Core.Managers;
+using Core.Services;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -9,11 +12,7 @@ namespace Overlay
     {
         private Loop _loop = new Loop();
         private NotifyIcon _trayIcon;
-        private readonly FrameCache _frameCache = new FrameCache(15, "withered_foxy", decodeWidth: 600);
         private JumpscareWindow? _jumpscareWindow;
-
-        private const byte _frameFrequency = 60; //milliseconds
-        private const ushort _jumpscareChance = 3;
 
         [DllImport("kernel32.dll")]
         private static extern bool SetProcessWorkingSetSize(IntPtr handle, IntPtr minSize, IntPtr maxSize);
@@ -43,14 +42,23 @@ namespace Overlay
             _trayIcon.ContextMenuStrip = contextMenu;
             _trayIcon.DoubleClick += (s, args) => ShowMainWindow();
 
-            _jumpscareWindow = new JumpscareWindow(_frameCache);
+            IConfigService configService = new ConfigService();
+            IUserManager userManager = new UserManager(configService);
+            IJumpscareManager jumpscareManager = new JumpscareManager(configService);
+
+            var selectedJumpscare = jumpscareManager.GetByName(userManager.GetSelectedJumpscare());
+
+            FrameCache frameCache = new FrameCache(selectedJumpscare.FrameAmount,
+                selectedJumpscare.AssetsPath, decodeWidth: 600);
+
+            //_jumpscareWindow = new JumpscareWindow(frameCache, selectedJumpscare.AssetsPath);
 
             _loop.OnTriggered += () =>
             {
                 Dispatcher.Invoke(async () =>
                 {
-                    var window = new JumpscareWindow(_frameCache);
-                    await window.PlayAndHide(_frameFrequency);
+                    var window = new JumpscareWindow(frameCache, selectedJumpscare.AssetsPath);
+                    await window.PlayAndHide(selectedJumpscare.FrameFrequency);
 
                     window.Close();
                     window = null;
@@ -62,7 +70,7 @@ namespace Overlay
                 });
             };
 
-            _ = _loop.StartAsync(_jumpscareChance);
+            _ = _loop.StartAsync(userManager.GetJumpscareChance());
         }
 
         protected override void OnExit(ExitEventArgs e)
