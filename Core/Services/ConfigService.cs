@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace Core.Services
 {
-    internal class ConfigService : IConfigService
+    public class ConfigService : IConfigService
     {
         private const string AppFolderName = "yakimi27/WindowsJumpscare";
         private const string UserConfigFileName = "userConfig.json";

@@ -1,6 +1,6 @@
 ﻿namespace Core.Services
 {
-    internal interface IConfigService
+    public interface IConfigService
     {
         string UserConfigFilePath { get; }
         string JumpscareConfigFilePath { get; }

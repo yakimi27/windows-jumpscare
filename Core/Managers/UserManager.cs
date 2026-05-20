@@ -1,9 +1,10 @@
 ﻿using Core.ConfigModels;
+using Core.Interfaces;
 using Core.Services;
 
 namespace Core.Managers
 {
-    internal class UserManager
+    public class UserManager : IUserManager
     {
         private readonly IConfigService _configService;
         private UserModel _userModel;

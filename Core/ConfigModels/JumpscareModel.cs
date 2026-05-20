@@ -1,6 +1,6 @@
 ﻿namespace Core.ConfigModels
 {
-    internal class JumpscareModel
+    public class JumpscareModel
     {
         public class JumpscareList
         {
