@@ -11,14 +11,15 @@ namespace Overlay
         private bool _isPlaying = false;
         private MediaPlayer _screamSound = new MediaPlayer();
 
-        internal JumpscareWindow(FrameCache cache)
+        internal JumpscareWindow(FrameCache cache, string assetsPath)
         {
             InitializeComponent();
             _cache = cache;
             Visibility = Visibility.Hidden;
 
             var soundPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
-                "Assets/withered_foxy/foxy_scream.wav");
+                $"{assetsPath}/scream.wav");
+
             if (File.Exists(soundPath))
             {
                 _screamSound.Open(new Uri(soundPath));
