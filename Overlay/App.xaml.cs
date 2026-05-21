@@ -38,6 +38,7 @@ namespace Overlay
 
             var contextMenu = new ContextMenuStrip();
             contextMenu.Items.Add("Show", null, (s, args) => ShowMainWindow());
+            contextMenu.Items.Add("Trigger jumpscare", null, onClick: async (s, args) => await _loop.Trigger());
             contextMenu.Items.Add("Exit", null, (s, args) => Shutdown());
             _trayIcon.ContextMenuStrip = contextMenu;
             _trayIcon.DoubleClick += (s, args) => ShowMainWindow();
@@ -51,21 +52,27 @@ namespace Overlay
             FrameCache frameCache = new FrameCache(selectedJumpscare.FrameAmount,
                 selectedJumpscare.AssetsPath, decodeWidth: 600);
 
-            //_jumpscareWindow = new JumpscareWindow(frameCache, selectedJumpscare.AssetsPath);
+            _jumpscareWindow = new JumpscareWindow(frameCache, selectedJumpscare.AssetsPath);
+            var frameFrequency = selectedJumpscare.FrameFrequency;
+            var selectedJumpscarePath = selectedJumpscare.AssetsPath;
+
+            //preload
+            await _jumpscareWindow.PreloadAsync();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            TrimWorkingSet();
 
             _loop.OnTriggered += () =>
             {
                 Dispatcher.Invoke(async () =>
                 {
-                    var window = new JumpscareWindow(frameCache, selectedJumpscare.AssetsPath);
-                    await window.PlayAndHide(selectedJumpscare.FrameFrequency);
+                    _jumpscareWindow.Show();
+                    await _jumpscareWindow.PlayAndHide(frameFrequency);
 
-                    window.Close();
-                    window = null;
+                    _jumpscareWindow.Hide();
 
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
-                    GC.Collect();
                     TrimWorkingSet();
                 });
             };
