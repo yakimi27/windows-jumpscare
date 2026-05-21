@@ -9,7 +9,7 @@
 
         public async Task StartAsync(int posibility)
         {
-            var _running = true;
+            _running = true;
 
             while (_running)
             {
@@ -20,6 +20,11 @@
 
                 await Task.Delay(3000);
             }
+        }
+        public Task Trigger()
+        {
+            OnTriggered?.Invoke();
+            return Task.CompletedTask;
         }
     }
 }
