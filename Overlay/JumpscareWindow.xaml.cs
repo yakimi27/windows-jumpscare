@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace Overlay
@@ -10,6 +11,7 @@ namespace Overlay
         private readonly FrameCache _cache;
         private bool _isPlaying = false;
         private MediaPlayer _screamSound = new MediaPlayer();
+        private IReadOnlyList<BitmapImage> _frames;
 
         internal JumpscareWindow(FrameCache cache, string assetsPath)
         {
@@ -23,22 +25,37 @@ namespace Overlay
             if (File.Exists(soundPath))
             {
                 _screamSound.Open(new Uri(soundPath));
+                _screamSound.Volume = 0; //muetd for priming
             }
+        }
+
+        internal async Task PreloadAsync()
+        {
+            _frames = await _cache.PreloadAsync().ContinueWith(_ => _cache.Acquire());
+
+            // prime
+            if (_frames.Count > 0)
+            {
+                JumpscareImage.Source = _frames[0];
+            }
+
+            _screamSound.Play();
+            _screamSound.Stop();
+            _screamSound.Volume = 1.0;
         }
 
         internal async Task PlayAndHide(byte frequency)
         {
             _isPlaying = true;
 
-            var frames = _cache.Acquire();
-            JumpscareImage.Source = frames[0];
+            JumpscareImage.Source = _frames[0];
             await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render);
 
             Visibility = Visibility.Visible;
 
             _ = PlaySound();
 
-            foreach (var frame in frames)
+            foreach (var frame in _frames)
             {
                 JumpscareImage.Source = frame;
                 await Task.Delay(frequency);
@@ -48,16 +65,15 @@ namespace Overlay
             await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render);
             await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
 
-            _cache.Release();
+            Visibility = Visibility.Hidden;
             _isPlaying = false;
-            // caller does  close + null after this returns
         }
 
         private async Task PlaySound()
         {
+            _screamSound.Position = TimeSpan.FromMilliseconds(1);
+            _screamSound.Position = TimeSpan.Zero;
             _screamSound.Play();
-            await Task.Delay((int)_screamSound.NaturalDuration.TimeSpan.TotalMilliseconds);
-            _screamSound.Stop();
         }
     }
 }

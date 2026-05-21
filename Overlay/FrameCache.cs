@@ -23,18 +23,38 @@ namespace Overlay
             _frames = new List<BitmapImage>();
             for (byte i = 1; i <= _frameQuantity; i++)
             {
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri($"pack://application:,,,/{_entityAssetsPath}/{i}.png");
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.CreateOptions = BitmapCreateOptions.None;
-                if (_decodeWidth.HasValue)
-                    bitmap.DecodePixelWidth = _decodeWidth.Value;
-                bitmap.EndInit();
-                bitmap.Freeze();
-                _frames.Add(bitmap);
+                _frames.Add(CreateFrame(i));
             }
             return _frames;
+        }
+
+        public async Task PreloadAsync()
+        {
+            if (_frames != null) return;
+
+            await Task.Run(() =>
+            {
+                var frames = new List<BitmapImage>();
+                for (byte i = 1; i <= _frameQuantity; i++)
+                {
+                    frames.Add(CreateFrame(i));
+                }
+                _frames = frames;
+            });
+        }
+
+        private BitmapImage CreateFrame(byte index)
+        {
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = new Uri($"pack://application:,,,/{_entityAssetsPath}/{index}.png");
+            bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            bitmap.CreateOptions = BitmapCreateOptions.None;
+            if (_decodeWidth.HasValue)
+                bitmap.DecodePixelWidth = _decodeWidth.Value;
+            bitmap.EndInit();
+            bitmap.Freeze();
+            return bitmap;
         }
 
         public void Release()
