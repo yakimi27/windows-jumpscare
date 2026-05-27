@@ -7,6 +7,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UseWPF>true</UseWPF>
 		<UseWindowsForms>true</UseWindowsForms>
+		<ApplicationIcon>windowsJumpscare.ico</ApplicationIcon>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -24,6 +25,7 @@
 		<None Remove="Assets\7.png" />
 		<None Remove="Assets\8.png" />
 		<None Remove="Assets\9.png" />
+		<None Remove="Assets\Icon\windowsJumpscare.ico" />
 		<None Remove="Assets\withered_foxy\0.png" />
 		<None Remove="Assets\withered_foxy\15.png" />
 		<None Remove="Assets\withered_freddy\1.png" />
@@ -70,7 +72,7 @@
 
 	<ItemGroup>
 		<Resource Include="Assets\withered_foxy\0.png">
-		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
 		<Resource Include="Assets\withered_foxy\1.png">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
@@ -90,7 +92,9 @@
 		<Resource Include="Assets\withered_foxy\14.png">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
-		<Resource Include="Assets\withered_foxy\15.png" />
+		<Resource Include="Assets\withered_foxy\15.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
 		<Resource Include="Assets\withered_foxy\2.png">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
@@ -115,51 +119,127 @@
 		<Resource Include="Assets\withered_foxy\9.png">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
+		<Content Include="Assets\Icon\windowsJumpscare.ico">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
 		<Content Include="Assets\withered_foxy\scream.wav">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Content Include="Assets\withered_freddy\scream.wav">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+		<Content Include="windowsJumpscare.ico" />
 		<Resource Include="Assets\withered_freddy\0.png">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\1.png">
 		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
-		<Resource Include="Assets\withered_freddy\1.png" />
-		<Resource Include="Assets\withered_freddy\10.png" />
-		<Resource Include="Assets\withered_freddy\11.png" />
-		<Resource Include="Assets\withered_freddy\12.png" />
-		<Resource Include="Assets\withered_freddy\13.png" />
-		<Resource Include="Assets\withered_freddy\14.png" />
-		<Resource Include="Assets\withered_freddy\15.png" />
-		<Resource Include="Assets\withered_freddy\16.png" />
-		<Resource Include="Assets\withered_freddy\17.png" />
-		<Resource Include="Assets\withered_freddy\18.png" />
-		<Resource Include="Assets\withered_freddy\19.png" />
-		<Resource Include="Assets\withered_freddy\2.png" />
-		<Resource Include="Assets\withered_freddy\20.png" />
-		<Resource Include="Assets\withered_freddy\21.png" />
-		<Resource Include="Assets\withered_freddy\22.png" />
-		<Resource Include="Assets\withered_freddy\23.png" />
-		<Resource Include="Assets\withered_freddy\24.png" />
-		<Resource Include="Assets\withered_freddy\25.png" />
-		<Resource Include="Assets\withered_freddy\26.png" />
-		<Resource Include="Assets\withered_freddy\27.png" />
-		<Resource Include="Assets\withered_freddy\28.png" />
-		<Resource Include="Assets\withered_freddy\29.png" />
-		<Resource Include="Assets\withered_freddy\3.png" />
-		<Resource Include="Assets\withered_freddy\30.png" />
-		<Resource Include="Assets\withered_freddy\31.png" />
-		<Resource Include="Assets\withered_freddy\32.png" />
-		<Resource Include="Assets\withered_freddy\33.png" />
-		<Resource Include="Assets\withered_freddy\34.png" />
-		<Resource Include="Assets\withered_freddy\35.png" />
-		<Resource Include="Assets\withered_freddy\36.png" />
-		<Resource Include="Assets\withered_freddy\4.png" />
-		<Resource Include="Assets\withered_freddy\5.png" />
-		<Resource Include="Assets\withered_freddy\6.png" />
-		<Resource Include="Assets\withered_freddy\7.png" />
-		<Resource Include="Assets\withered_freddy\8.png" />
-		<Resource Include="Assets\withered_freddy\9.png" />
+		<Resource Include="Assets\withered_freddy\10.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\11.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\12.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\13.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\14.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\15.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\16.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\17.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\18.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\19.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\2.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\20.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\21.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\22.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\23.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\24.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\25.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\26.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\27.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\28.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\29.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\3.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\30.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\31.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\32.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\33.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\34.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\35.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\36.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\4.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\5.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\6.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\7.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\8.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="Assets\withered_freddy\9.png">
+		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Resource>
 	</ItemGroup>
 
 </Project>

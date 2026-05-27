@@ -31,9 +31,9 @@ namespace Overlay
 
             _trayIcon = new NotifyIcon
             {
-                Icon = SystemIcons.Application,
+                Icon = new System.Drawing.Icon("Assets/Icon/windowsJumpscare.ico"),
                 Visible = true,
-                Text = "Jumpscare App"
+                Text = "Windows Jumpscare"
             };
 
             var contextMenu = new ContextMenuStrip();

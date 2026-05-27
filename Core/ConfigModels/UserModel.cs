@@ -2,7 +2,7 @@
 {
     public class UserModel
     {
-        public ushort JumpscareChance { get; set; } = 10000; //max65536
+        public ushort JumpscareChance { get; set; } = 65535; // max 65535
         public string SelectedJumpscare { get; set; } = "Withered Foxy";
     }
 }
