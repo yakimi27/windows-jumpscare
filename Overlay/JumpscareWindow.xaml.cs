@@ -25,7 +25,7 @@ namespace Overlay
             if (File.Exists(soundPath))
             {
                 _screamSound.Open(new Uri(soundPath));
-                _screamSound.Volume = 0; //muetd for priming
+                _screamSound.Volume = 0; //muted for priming
             }
         }
 
