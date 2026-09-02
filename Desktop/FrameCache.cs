@@ -1,6 +1,6 @@
-﻿using System.Windows.Media.Imaging;
+using System.Windows.Media.Imaging;
 
-namespace Overlay
+namespace Desktop
 {
     internal class FrameCache
     {

@@ -1,4 +1,4 @@
-﻿using Core;
+using Core;
 using Core.Interfaces;
 using Core.Managers;
 using Core.Services;
@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 
 
-namespace Overlay
+namespace Desktop
 {
     public partial class App : System.Windows.Application
     {
