@@ -4,6 +4,7 @@ using Core.Managers;
 using Core.Services;
 using System.Runtime.InteropServices;
 using System.Windows;
+using Desktop.Views;
 
 
 namespace Desktop
@@ -13,6 +14,7 @@ namespace Desktop
         private Loop _loop = new Loop();
         private NotifyIcon _trayIcon;
         private JumpscareWindow? _jumpscareWindow;
+		private SettingsWindow? _settingsWindow;
 
         [DllImport("kernel32.dll")]
         private static extern bool SetProcessWorkingSetSize(IntPtr handle, IntPtr minSize, IntPtr maxSize);
@@ -88,8 +90,9 @@ namespace Desktop
 
         private void ShowMainWindow()
         {
-            MainWindow?.Show();
-            MainWindow?.Activate();
+            _settingsWindow ??= new SettingsWindow();
+			_settingsWindow.Show();
+            _settingsWindow?.Activate();
         }
     }
 }
