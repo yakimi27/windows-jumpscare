@@ -4,7 +4,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
-namespace Desktop
+namespace Desktop.Views
 {
     public partial class JumpscareWindow : Window
     {
