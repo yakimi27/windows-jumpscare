@@ -6,11 +6,215 @@
         xmlns:local="clr-namespace:Desktop"
         mc:Ignorable="d"
         Title="Settings"
-        WindowStartupLocation="CenterScreen">
-    <Window.Background>
-        <SolidColorBrush Opacity="0" Color="White"/>
-    </Window.Background>
-    <Grid>
-		<TextBlock Text="LOL"/>
+        Width="520"
+        SizeToContent="Height"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+    <Window.Resources>
+        <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="{DynamicResource {x:Static SystemColors.HighlightColorKey}}"/>
+
+        <Style x:Key="FocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="-2" StrokeDashArray="1 2" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1.5"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- toggle via visualStateManager-->
+        <Style x:Key="ToggleSwitchStyle" TargetType="{x:Type CheckBox}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Grid Width="46" Height="24" Cursor="Hand">
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="CommonStates">
+                                        <VisualState x:Name="Normal" />
+                                        <VisualState x:Name="MouseOver">
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="SwitchBackground" Storyboard.TargetProperty="Opacity" To="0.85" Duration="0:0:0.1"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Disabled">
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="SwitchBackground" Storyboard.TargetProperty="Opacity" To="0.4" Duration="0:0:0.1"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                    </VisualStateGroup>
+                                    <VisualStateGroup x:Name="CheckStates">
+                                        <VisualState x:Name="Checked">
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="ThumbTransform" Storyboard.TargetProperty="X" To="22" Duration="0:0:0.2">
+                                                    <DoubleAnimation.EasingFunction>
+                                                        <CubicEase EasingMode="EaseOut"/>
+                                                    </DoubleAnimation.EasingFunction>
+                                                </DoubleAnimation>
+                                                <ColorAnimation Storyboard.TargetName="SwitchBackgroundBrush" Storyboard.TargetProperty="Color" To="{DynamicResource {x:Static SystemColors.HighlightColorKey}}" Duration="0:0:0.2"/>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Unchecked">
+                                            <Storyboard>
+                                                <DoubleAnimation Storyboard.TargetName="ThumbTransform" Storyboard.TargetProperty="X" To="0" Duration="0:0:0.2">
+                                                    <DoubleAnimation.EasingFunction>
+                                                        <CubicEase EasingMode="EaseOut"/>
+                                                    </DoubleAnimation.EasingFunction>
+                                                </DoubleAnimation>
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="Indeterminate" />
+                                    </VisualStateGroup>
+                                </VisualStateManager.VisualStateGroups>
+
+                                <Border x:Name="SwitchBackground" CornerRadius="12" 
+                                        BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" 
+                                        BorderThickness="1">
+                                    <Border.Background>
+                                        <SolidColorBrush x:Name="SwitchBackgroundBrush" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
+                                    </Border.Background>
+                                </Border>
+                                <Ellipse x:Name="SwitchThumb" Width="18" Height="18" 
+                                         Fill="{DynamicResource {x:Static SystemColors.WindowBrushKey}}" 
+                                         HorizontalAlignment="Left" Margin="3,0,0,0">
+                                    <Ellipse.RenderTransform>
+                                        <TranslateTransform x:Name="ThumbTransform" X="0"/>
+                                    </Ellipse.RenderTransform>
+                                </Ellipse>
+                            </Grid>
+                            <ContentPresenter Margin="10,0,0,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="SwitchBackground" Property="BorderBrush" Value="{StaticResource SystemControlHighlightAccentBrush}"/>
+                                <Setter TargetName="SwitchBackground" Property="BorderThickness" Value="2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
+                   Text="Settings Menu" FontSize="22" FontWeight="Bold" Margin="0,0,0,16"/>
+
+        <!-- jumpscare -->
+        <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,24,16" VerticalAlignment="Top">
+            <TextBlock Text="Selected jumpscare" FontSize="14" FontWeight="SemiBold"/>
+            <TextBlock Text="Choose character model" FontSize="12" 
+                       Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Margin="0,2,0,0"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,16">
+            <ComboBox x:Name="JumpscareComboBox" Height="32" VerticalContentAlignment="Center"
+                      AutomationProperties.Name="Selected Jumpscare Character"/>
+            <Border Margin="0,8,0,0" CornerRadius="8" Padding="8" 
+                    Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" 
+                    BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" 
+                    BorderThickness="1" HorizontalAlignment="Left" Width="140" Height="100">
+                <Grid>
+                    <Image x:Name="CharacterPreviewImage" Stretch="Uniform" 
+                           AutomationProperties.Name="Character Visual Preview"/>
+                    <TextBlock Text="Preview Thumbnail" FontSize="11" 
+                               Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" 
+                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+        </StackPanel>
+
+        <!-- freq -->
+        <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,24,16" VerticalAlignment="Top">
+            <TextBlock Text="Trigger Frequency" FontSize="14" FontWeight="SemiBold"/>
+            <TextBlock Text="How often jumpscares trigger" FontSize="12" 
+                       Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Margin="0,2,0,0"/>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,0,0,16">
+            <Slider x:Name="FrequencySlider" Minimum="1" Maximum="4" Value="2" 
+                    TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight"
+                    AutomationProperties.Name="Jumpscare Trigger Frequency"/>
+            <Grid Margin="0,4,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="Rare" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Left"/>
+                <TextBlock Grid.Column="1" Text="Balanced" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="Frequent" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="3" Text="Insane" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Right"/>
+            </Grid>
+        </StackPanel>
+
+        <!-- volume -->
+        <StackPanel Grid.Row="3" Grid.Column="0" Margin="0,0,24,16" VerticalAlignment="Top">
+            <TextBlock Text="Audio Settings" FontSize="14" FontWeight="SemiBold"/>
+            <TextBlock Text="Adjust volume &amp; sound mute" FontSize="12" 
+                       Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Margin="0,2,0,0"/>
+        </StackPanel>
+        <Grid Grid.Row="3" Grid.Column="1" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Slider x:Name="VolumeSlider" Grid.Column="0" Minimum="0" Maximum="100" Value="80" 
+                    VerticalAlignment="Center" Margin="0,0,16,0"
+                    AutomationProperties.Name="Audio Volume Slider"/>
+            <CheckBox x:Name="MuteSwitch" Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" 
+                      VerticalAlignment="Center" Content="Mute"
+                      AutomationProperties.Name="Mute Audio Toggle"/>
+        </Grid>
+
+        <!-- autostart -->
+        <StackPanel Grid.Row="4" Grid.Column="0" Margin="0,0,24,16" VerticalAlignment="Top">
+            <TextBlock Text="Autostart" FontSize="14" FontWeight="SemiBold"/>
+            <TextBlock Text="Run automatically on system startup" FontSize="12" 
+                       Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Margin="0,2,0,0"/>
+        </StackPanel>
+        <CheckBox x:Name="AutostartSwitch" Grid.Row="4" Grid.Column="1" 
+                  Style="{StaticResource ToggleSwitchStyle}" VerticalAlignment="Center" Margin="0,0,0,16"
+                  AutomationProperties.Name="Autostart Background Service Switch"/>
+
+        <!-- test jumpscare -->
+        <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,16" HorizontalAlignment="Right">
+            <Button x:Name="TestJumpscareButton" Content="⚡ Test Jumpscare" Height="36" Padding="20,6" 
+                    FontWeight="SemiBold" FontSize="14" Foreground="White" 
+                    Background="{StaticResource SystemControlHighlightAccentBrush}" BorderThickness="0" 
+                    Cursor="Hand" FocusVisualStyle="{StaticResource FocusVisual}"
+                    AutomationProperties.Name="Test Jumpscare Button"/>
+        </StackPanel>
+
+        <Rectangle Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Height="1" 
+                   Fill="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" 
+                   Margin="0,0,0,16" Opacity="0.5"/>
+
+        <!-- status -->
+        <Border Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" CornerRadius="12" 
+                Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" 
+                Padding="12,6" HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Ellipse Width="8" Height="8" Fill="#107C41" Margin="0,0,8,0"/>
+                <TextBlock Text="Status: Active in system tray" FontSize="12" 
+                           Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" FontWeight="Medium"/>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
