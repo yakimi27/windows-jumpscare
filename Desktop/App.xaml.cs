@@ -90,9 +90,13 @@ namespace Desktop
 
         private void ShowMainWindow()
         {
-            _settingsWindow ??= new SettingsWindow();
-			_settingsWindow.Show();
-            _settingsWindow?.Activate();
+            if (_settingsWindow == null)
+            {
+                _settingsWindow = new SettingsWindow();
+                _settingsWindow.Closed += (s, e) => _settingsWindow = null;
+            }
+            _settingsWindow.Show();
+            _settingsWindow.Activate();
         }
     }
 }
