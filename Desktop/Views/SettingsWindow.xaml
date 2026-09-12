@@ -125,7 +125,8 @@
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,16">
             <ComboBox x:Name="JumpscareComboBox" Height="32" VerticalContentAlignment="Center"
-                      AutomationProperties.Name="Selected Jumpscare Character"/>
+                      AutomationProperties.Name="Selected Jumpscare Character"
+                      SelectionChanged="JumpscareComboBox_SelectionChanged"/>
             <Border Margin="0,8,0,0" CornerRadius="8" Padding="8" 
                     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" 
                     BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" 
@@ -149,7 +150,8 @@
         <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,0,0,16">
             <Slider x:Name="FrequencySlider" Minimum="1" Maximum="4" Value="2" 
                     TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight"
-                    AutomationProperties.Name="Jumpscare Trigger Frequency"/>
+                    AutomationProperties.Name="Jumpscare Trigger Frequency"
+                    ValueChanged="FrequencySlider_ValueChanged"/>
             <Grid Margin="0,4,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -177,10 +179,12 @@
             </Grid.ColumnDefinitions>
             <Slider x:Name="VolumeSlider" Grid.Column="0" Minimum="0" Maximum="100" Value="80" 
                     VerticalAlignment="Center" Margin="0,0,16,0"
-                    AutomationProperties.Name="Audio Volume Slider"/>
+                    AutomationProperties.Name="Audio Volume Slider"
+                    ValueChanged="VolumeSlider_ValueChanged"/>
             <CheckBox x:Name="MuteSwitch" Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" 
                       VerticalAlignment="Center" Content="Mute"
-                      AutomationProperties.Name="Mute Audio Toggle"/>
+                      AutomationProperties.Name="Mute Audio Toggle"
+                      Checked="MuteSwitch_Checked" Unchecked="MuteSwitch_Unchecked"/>
         </Grid>
 
         <!-- autostart -->
@@ -191,7 +195,8 @@
         </StackPanel>
         <CheckBox x:Name="AutostartSwitch" Grid.Row="4" Grid.Column="1" 
                   Style="{StaticResource ToggleSwitchStyle}" VerticalAlignment="Center" Margin="0,0,0,16"
-                  AutomationProperties.Name="Autostart Background Service Switch"/>
+                  AutomationProperties.Name="Autostart Background Service Switch"
+                  Checked="AutostartSwitch_Checked" Unchecked="AutostartSwitch_Unchecked"/>
 
         <!-- test jumpscare -->
         <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,16" HorizontalAlignment="Right">
@@ -199,7 +204,8 @@
                     FontWeight="SemiBold" FontSize="14" Foreground="White" 
                     Background="{StaticResource SystemControlHighlightAccentBrush}" BorderThickness="0" 
                     Cursor="Hand" FocusVisualStyle="{StaticResource FocusVisual}"
-                    AutomationProperties.Name="Test Jumpscare Button"/>
+                    AutomationProperties.Name="Test Jumpscare Button"
+                    Click="TestJumpscareButton_Click"/>
         </StackPanel>
 
         <Rectangle Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Height="1" 
