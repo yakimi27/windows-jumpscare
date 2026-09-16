@@ -93,7 +93,13 @@ namespace Desktop
             if (_settingsWindow == null)
             {
                 _settingsWindow = new SettingsWindow();
-                _settingsWindow.Closed += (s, e) => _settingsWindow = null;
+                _settingsWindow.Closed += (s, e) =>
+                {
+                    _settingsWindow = null;
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                    TrimWorkingSet();
+                };
             }
             _settingsWindow.Show();
             _settingsWindow.Activate();
