@@ -18,6 +18,8 @@ namespace Desktop.Views
         private readonly IUserManager _userManager;
         private readonly IJumpscareManager _jumpscareManager;
 		private bool _isLoading;
+        private CancellationTokenSource? _previewCts;
+        private FrameCache? _previewCache;
 
         internal SettingsWindow() : this(new ConfigService())
         {
@@ -94,40 +96,66 @@ namespace Desktop.Views
             _userManager.SetJumpscareChance(chance);
         }
 
-		private void UpdateCharacterPreview()
-		{
-			if (JumpscareComboBox.SelectedItem is string selectedName)
-			{
-				var jumpscare = _jumpscareManager.GetByName(selectedName);
-				if (jumpscare != null && !string.IsNullOrEmpty(jumpscare.AssetsPath))
-				{
-					string previewPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, jumpscare.AssetsPath, "10.png");
+        private async void UpdateCharacterPreview()
+        {
+            _previewCts?.Cancel();
+            _previewCts?.Dispose();
+            _previewCts = new CancellationTokenSource();
+            var token = _previewCts.Token;
 
-					if (File.Exists(previewPath))
-					{
-						try
-						{
-							var bitmap = new BitmapImage();
-							bitmap.BeginInit();
-							bitmap.UriSource = new Uri(previewPath, UriKind.RelativeOrAbsolute);
-							bitmap.CacheOption = BitmapCacheOption.OnLoad;
-							bitmap.EndInit();
-							bitmap.Freeze();
+            if (JumpscareComboBox.SelectedItem is not string selectedName)
+            {
+                SetPreviewState(null);
+                return;
+            }
 
-							CharacterPreviewImage.Source = bitmap;
-							return;
-						}
-						catch
-						{
-							// ignore
-						}
-					}
-				}
-			}
+            var jumpscare = _jumpscareManager.GetByName(selectedName);
+            if (jumpscare == null || string.IsNullOrEmpty(jumpscare.AssetsPath))
+            {
+                SetPreviewState(null);
+                return;
+            }
 
-			CharacterPreviewImage.Source = null;
-		}
+            int frameIndex = 0;
+            int frameDelay = jumpscare.FrameFrequency > 0 ? jumpscare.FrameFrequency : 50;
 
+            try
+            {
+                _previewCache = new FrameCache(jumpscare.FrameAmount, jumpscare.AssetsPath, decodeWidth: 280);
+
+                await _previewCache.PreloadAsync();
+                if (token.IsCancellationRequested) return;
+
+                var frames = _previewCache.Acquire();
+                if (frames.Count == 0)
+                {
+                    SetPreviewState(null);
+                    return;
+                }
+
+                while (!token.IsCancellationRequested)
+                {
+                    SetPreviewState(frames[frameIndex]);
+                    frameIndex = (frameIndex + 1) % frames.Count;
+
+                    await Task.Delay(frameDelay, token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // normal cancel
+            }
+            catch
+            {
+                SetPreviewState(null);
+            }
+        }
+
+        private void SetPreviewState(ImageSource? source)
+        {
+            CharacterPreviewImage.Source = source;
+            PreviewPlaceholderText.Visibility = source != null ? Visibility.Collapsed : Visibility.Visible;
+        }
         private static double MapChanceToSliderValue(ushort chance)
         {
             return chance switch
@@ -203,6 +231,13 @@ namespace Desktop.Views
         }
 
         #endregion
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            _previewCts?.Cancel();
+            _previewCts?.Dispose();
+            _previewCache?.Release();
+        }
     }
 }
- 

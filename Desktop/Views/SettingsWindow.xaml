@@ -133,8 +133,9 @@
                     BorderThickness="1" HorizontalAlignment="Left" Width="140" Height="100">
                 <Grid>
                     <Image x:Name="CharacterPreviewImage" Stretch="Uniform" 
+                           RenderOptions.BitmapScalingMode="HighQuality"
                            AutomationProperties.Name="Character Visual Preview"/>
-                    <TextBlock Text="Preview Thumbnail" FontSize="11" 
+                    <TextBlock x:Name="PreviewPlaceholderText" Text="Preview Thumbnail" FontSize="11" 
                                Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" 
                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Grid>
