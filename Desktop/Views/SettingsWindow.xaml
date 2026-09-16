@@ -132,7 +132,7 @@
                     BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" 
                     BorderThickness="1" HorizontalAlignment="Left" Width="140" Height="100">
                 <Grid>
-                    <Image x:Name="CharacterPreviewImage" Stretch="Uniform" 
+                    <Image x:Name="CharacterPreviewImage" Stretch="UniformToFill" 
                            RenderOptions.BitmapScalingMode="HighQuality"
                            AutomationProperties.Name="Character Visual Preview"/>
                     <TextBlock x:Name="PreviewPlaceholderText" Text="Preview Thumbnail" FontSize="11" 
