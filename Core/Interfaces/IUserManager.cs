@@ -2,6 +2,7 @@
 {
     public interface IUserManager
     {
+        event Action<string>? JumpscareChanged;
         ushort GetJumpscareChance();
         string GetSelectedJumpscare();
         void SetJumpscareChance(ushort chance);
