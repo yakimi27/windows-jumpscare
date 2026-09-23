@@ -11,10 +11,14 @@ namespace Desktop
 {
     public partial class App : System.Windows.Application
     {
+        private readonly IConfigService _configService = new ConfigService();
+        private IUserManager _userManager = null!;
+        private IJumpscareManager _jumpscareManager = null!;
         private Loop _loop = new Loop();
-        private NotifyIcon _trayIcon;
+        private NotifyIcon _trayIcon = null!;
         private JumpscareWindow? _jumpscareWindow;
-		private SettingsWindow? _settingsWindow;
+        private SettingsWindow? _settingsWindow;
+        private byte _frameFrequency;
 
         [DllImport("kernel32.dll")]
         private static extern bool SetProcessWorkingSetSize(IntPtr handle, IntPtr minSize, IntPtr maxSize);
@@ -45,41 +49,62 @@ namespace Desktop
             _trayIcon.ContextMenuStrip = contextMenu;
             _trayIcon.DoubleClick += (s, args) => ShowMainWindow();
 
-            IConfigService configService = new ConfigService();
-            IUserManager userManager = new UserManager(configService);
-            IJumpscareManager jumpscareManager = new JumpscareManager(configService);
+            _userManager = new UserManager(_configService);
+            _jumpscareManager = new JumpscareManager(_configService);
 
-            var selectedJumpscare = jumpscareManager.GetByName(userManager.GetSelectedJumpscare());
+            _userManager.JumpscareChanged += OnJumpscareChanged;
 
-            FrameCache frameCache = new FrameCache(selectedJumpscare.FrameAmount,
-                selectedJumpscare.AssetsPath, decodeWidth: 600);
-
-            _jumpscareWindow = new JumpscareWindow(frameCache, selectedJumpscare.AssetsPath);
-            var frameFrequency = selectedJumpscare.FrameFrequency;
-            var selectedJumpscarePath = selectedJumpscare.AssetsPath;
-
-            //preload
-            await _jumpscareWindow.PreloadAsync();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            TrimWorkingSet();
+            await LoadJumpscareAsync(_userManager.GetSelectedJumpscare());
 
             _loop.OnTriggered += () =>
             {
                 Dispatcher.Invoke(async () =>
                 {
-                    _jumpscareWindow.Show();
-                    await _jumpscareWindow.PlayAndHide(frameFrequency);
+                    if (_jumpscareWindow != null)
+                    {
+                        _jumpscareWindow.Show();
+                        await _jumpscareWindow.PlayAndHide(_frameFrequency);
 
-                    _jumpscareWindow.Hide();
+                        _jumpscareWindow.Hide();
 
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                    TrimWorkingSet();
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        TrimWorkingSet();
+                    }
                 });
             };
 
-            _ = _loop.StartAsync(userManager.GetJumpscareChance());
+            _ = _loop.StartAsync(_userManager.GetJumpscareChance());
+        }
+
+        private async void OnJumpscareChanged(string jumpscareName)
+        {
+            await LoadJumpscareAsync(jumpscareName);
+        }
+
+        private async Task LoadJumpscareAsync(string jumpscareName)
+        {
+            var selectedJumpscare = _jumpscareManager.GetByName(jumpscareName);
+            if (selectedJumpscare == null) return;
+
+            if (_jumpscareWindow != null)
+            {
+                _jumpscareWindow.Close();
+                _jumpscareWindow = null;
+            }
+
+            FrameCache frameCache = new FrameCache(
+                selectedJumpscare.FrameAmount,
+                selectedJumpscare.AssetsPath,
+                decodeWidth: 600);
+
+            _jumpscareWindow = new JumpscareWindow(frameCache, selectedJumpscare.AssetsPath);
+            _frameFrequency = selectedJumpscare.FrameFrequency;
+
+            await _jumpscareWindow.PreloadAsync();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            TrimWorkingSet();
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -92,7 +117,7 @@ namespace Desktop
         {
             if (_settingsWindow == null)
             {
-                _settingsWindow = new SettingsWindow();
+                _settingsWindow = new SettingsWindow(_configService, _userManager, _jumpscareManager);
                 _settingsWindow.Closed += (s, e) =>
                 {
                     _settingsWindow = null;
