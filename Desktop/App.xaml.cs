@@ -60,7 +60,7 @@ namespace Desktop
             {
                 Dispatcher.Invoke(async () =>
                 {
-                    if (_jumpscareWindow != null)
+                    if (_jumpscareWindow != null && !_jumpscareWindow.IsPlaying)
                     {
                         _jumpscareWindow.Show();
                         await _jumpscareWindow.PlayAndHide(_frameFrequency);
@@ -117,7 +117,7 @@ namespace Desktop
         {
             if (_settingsWindow == null)
             {
-                _settingsWindow = new SettingsWindow(_configService, _userManager, _jumpscareManager);
+                _settingsWindow = new SettingsWindow(_configService, _userManager, _jumpscareManager, _loop);
                 _settingsWindow.Closed += (s, e) =>
                 {
                     _settingsWindow = null;

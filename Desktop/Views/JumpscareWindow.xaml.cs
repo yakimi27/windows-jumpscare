@@ -13,6 +13,8 @@ namespace Desktop.Views
         private MediaPlayer _screamSound = new MediaPlayer();
         private IReadOnlyList<BitmapImage> _frames;
 
+        internal bool IsPlaying => _isPlaying;
+
         internal JumpscareWindow(FrameCache cache, string assetsPath)
         {
             InitializeComponent();
@@ -46,27 +48,34 @@ namespace Desktop.Views
 
         internal async Task PlayAndHide(byte frequency)
         {
+            if (_isPlaying) return;
             _isPlaying = true;
 
-            JumpscareImage.Source = _frames[0];
-            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render);
-
-            Visibility = Visibility.Visible;
-
-            _ = PlaySound();
-
-            foreach (var frame in _frames)
+            try
             {
-                JumpscareImage.Source = frame;
-                await Task.Delay(frequency);
+                JumpscareImage.Source = _frames[0];
+                await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render);
+
+                Visibility = Visibility.Visible;
+
+                _ = PlaySound();
+
+                foreach (var frame in _frames)
+                {
+                    JumpscareImage.Source = frame;
+                    await Task.Delay(frequency);
+                }
+
+                JumpscareImage.Source = null;
+                await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render);
+                await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
+
+                Visibility = Visibility.Hidden;
             }
-
-            JumpscareImage.Source = null;
-            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render);
-            await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
-
-            Visibility = Visibility.Hidden;
-            _isPlaying = false;
+            finally
+            {
+                _isPlaying = false;
+            }
         }
 
         private async Task PlaySound()

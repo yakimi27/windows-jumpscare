@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using Core;
 using Core.Interfaces;
 using Core.Managers;
 using Core.Services;
@@ -17,6 +18,7 @@ namespace Desktop.Views
         private readonly IConfigService _configService;
         private readonly IUserManager _userManager;
         private readonly IJumpscareManager _jumpscareManager;
+        private readonly Loop? _loop;
 		private bool _isLoading;
         private CancellationTokenSource? _previewCts;
         private FrameCache? _previewCache;
@@ -32,10 +34,16 @@ namespace Desktop.Views
         }
 
         internal SettingsWindow(IConfigService configService, IUserManager userManager, IJumpscareManager jumpscareManager)
+			: this(configService, userManager, jumpscareManager, null)
+        {
+        }
+
+        internal SettingsWindow(IConfigService configService, IUserManager userManager, IJumpscareManager jumpscareManager, Loop? loop)
         {
             _configService = configService;
             _userManager = userManager;
             _jumpscareManager = jumpscareManager;
+            _loop = loop;
 
             InitializeComponent();
             InitializeControls();
@@ -224,10 +232,22 @@ namespace Desktop.Views
             // Scaffold: Handle autostart switch unchecked
         }
 
-        private void TestJumpscareButton_Click(object sender, RoutedEventArgs e)
+        private async void TestJumpscareButton_Click(object sender, RoutedEventArgs e)
         {
 			if(_isLoading) return;
-            // Scaffold: Handle test jumpscare button click
+            if (_loop != null)
+            {
+                TestJumpscareButton.IsEnabled = false;
+                try
+                {
+                    await _loop.Trigger();
+                    await Task.Delay(500);
+                }
+                finally
+                {
+                    TestJumpscareButton.IsEnabled = true;
+                }
+            }
         }
 
         #endregion
