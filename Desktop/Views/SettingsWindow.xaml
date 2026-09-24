@@ -23,52 +23,16 @@
             </Setter>
         </Style>
 
-        <!-- toggle via visualStateManager-->
+        <!-- toggle switch style -->
         <Style x:Key="ToggleSwitchStyle" TargetType="{x:Type CheckBox}">
             <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type CheckBox}">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Grid Width="46" Height="24" Cursor="Hand">
-                                <VisualStateManager.VisualStateGroups>
-                                    <VisualStateGroup x:Name="CommonStates">
-                                        <VisualState x:Name="Normal" />
-                                        <VisualState x:Name="MouseOver">
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetName="SwitchBackground" Storyboard.TargetProperty="Opacity" To="0.85" Duration="0:0:0.1"/>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState x:Name="Disabled">
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetName="SwitchBackground" Storyboard.TargetProperty="Opacity" To="0.4" Duration="0:0:0.1"/>
-                                            </Storyboard>
-                                        </VisualState>
-                                    </VisualStateGroup>
-                                    <VisualStateGroup x:Name="CheckStates">
-                                        <VisualState x:Name="Checked">
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetName="ThumbTransform" Storyboard.TargetProperty="X" To="22" Duration="0:0:0.2">
-                                                    <DoubleAnimation.EasingFunction>
-                                                        <CubicEase EasingMode="EaseOut"/>
-                                                    </DoubleAnimation.EasingFunction>
-                                                </DoubleAnimation>
-                                                <ColorAnimation Storyboard.TargetName="SwitchBackgroundBrush" Storyboard.TargetProperty="Color" To="{DynamicResource {x:Static SystemColors.HighlightColorKey}}" Duration="0:0:0.2"/>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState x:Name="Unchecked">
-                                            <Storyboard>
-                                                <DoubleAnimation Storyboard.TargetName="ThumbTransform" Storyboard.TargetProperty="X" To="0" Duration="0:0:0.2">
-                                                    <DoubleAnimation.EasingFunction>
-                                                        <CubicEase EasingMode="EaseOut"/>
-                                                    </DoubleAnimation.EasingFunction>
-                                                </DoubleAnimation>
-                                            </Storyboard>
-                                        </VisualState>
-                                        <VisualState x:Name="Indeterminate" />
-                                    </VisualStateGroup>
-                                </VisualStateManager.VisualStateGroups>
-
+                            <Grid Width="46" Height="24" Cursor="Hand" Background="Transparent">
                                 <Border x:Name="SwitchBackground" CornerRadius="12" 
                                         BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" 
                                         BorderThickness="1">
@@ -87,6 +51,20 @@
                             <ContentPresenter Margin="10,0,0,0" VerticalAlignment="Center"/>
                         </StackPanel>
                         <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="SwitchThumb" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <TranslateTransform X="22"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="SwitchBackground" Property="Background" Value="{StaticResource SystemControlHighlightAccentBrush}"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="SwitchBackground" Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="SwitchBackground" Property="Opacity" Value="0.4"/>
+                            </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
                                 <Setter TargetName="SwitchBackground" Property="BorderBrush" Value="{StaticResource SystemControlHighlightAccentBrush}"/>
                                 <Setter TargetName="SwitchBackground" Property="BorderThickness" Value="2"/>
@@ -195,7 +173,7 @@
                        Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Margin="0,2,0,0"/>
         </StackPanel>
         <CheckBox x:Name="AutostartSwitch" Grid.Row="4" Grid.Column="1" 
-                  Style="{StaticResource ToggleSwitchStyle}" VerticalAlignment="Center" Margin="0,0,0,16"
+                  Style="{StaticResource ToggleSwitchStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,0,16"
                   AutomationProperties.Name="Autostart Background Service Switch"
                   Checked="AutostartSwitch_Checked" Unchecked="AutostartSwitch_Unchecked"/>
 
