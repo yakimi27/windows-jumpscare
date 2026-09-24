@@ -82,6 +82,8 @@ namespace Desktop.Views
 				ushort chance = _userManager.GetJumpscareChance();
 				FrequencySlider.Value = MapChanceToSliderValue(chance);
 
+				AutostartSwitch.IsChecked = _userManager.IsAutostartEnabled();
+
 				UpdateCharacterPreview();
 			}
 			finally
@@ -222,14 +224,14 @@ namespace Desktop.Views
 
         private void AutostartSwitch_Checked(object sender, RoutedEventArgs e)
         {
-			if(_isLoading) return;
-            // Scaffold: Handle autostart switch checked
+            if (_isLoading) return;
+            _userManager.SetAutostart(true);
         }
 
         private void AutostartSwitch_Unchecked(object sender, RoutedEventArgs e)
         {
-			if(_isLoading) return;
-            // Scaffold: Handle autostart switch unchecked
+            if (_isLoading) return;
+            _userManager.SetAutostart(false);
         }
 
         private async void TestJumpscareButton_Click(object sender, RoutedEventArgs e)
