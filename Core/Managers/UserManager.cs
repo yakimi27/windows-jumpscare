@@ -1,6 +1,7 @@
-﻿using Core.ConfigModels;
+using Core.ConfigModels;
 using Core.Interfaces;
 using Core.Services;
+using System.Runtime.Versioning;
 
 namespace Core.Managers
 {
@@ -18,6 +19,25 @@ namespace Core.Managers
 
         public ushort GetJumpscareChance() => _userModel.JumpscareChance;
         public string GetSelectedJumpscare() => _userModel.SelectedJumpscare;
+        [SupportedOSPlatform("windows")]
+        public bool IsAutostartEnabled()
+        {
+            bool enabled = AutostartManager.IsAutostartEnabled();
+            if (_userModel.IsAutostartEnabled != enabled)
+            {
+                _userModel.IsAutostartEnabled = enabled;
+                Save();
+            }
+            return enabled;
+        }
+
+        [SupportedOSPlatform("windows")]
+        public void SetAutostart(bool enable)
+        {
+            _userModel.IsAutostartEnabled = enable;
+            Save();
+            AutostartManager.SetAutostart(enable);
+        }
 
         public void SetJumpscareChance(ushort chance)
         {
