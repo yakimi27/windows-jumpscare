@@ -35,9 +35,13 @@ namespace Desktop
         {
             base.OnStartup(e);
 
+            using var iconStream = GetResourceStream(
+                new Uri("pack://application:,,,/windowsJumpscare.ico")
+            )?.Stream;
+
             _trayIcon = new NotifyIcon
             {
-                Icon = new System.Drawing.Icon("Assets/Icon/windowsJumpscare.ico"),
+                Icon = iconStream != null ? new System.Drawing.Icon(iconStream) : null,
                 Visible = true,
                 Text = "Windows Jumpscare"
             };
