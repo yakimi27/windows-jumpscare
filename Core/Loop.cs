@@ -7,13 +7,13 @@ namespace Core
         public const int DefaultPossibility = Constants.DefaultJumpscareChance;
         private readonly Random _random = new Random();
         private bool _running;
-        private volatile int _posibility;
+        private volatile int _possibility;
 
         public event Func<Task>? OnTriggered;
 
         public int JumpscareChance
         {
-            get => _posibility;
+            get => _possibility;
             set => UpdatePossibility(value);
         }
 
@@ -23,21 +23,21 @@ namespace Core
             {
                 newPossibility = DefaultPossibility;
             }
-            _posibility = newPossibility;
+            _possibility = newPossibility;
         }
 
-        public async Task StartAsync(int posibility)
+        public async Task StartAsync(int possibility)
         {
-            if (posibility <= 0)
+            if (possibility <= 0)
             {
-                posibility = DefaultPossibility;
+                possibility = DefaultPossibility;
             }
-            _posibility = posibility;
+            _possibility = possibility;
             _running = true;
 
             while (_running)
             {
-                int currentPossibility = _posibility;
+                int currentPossibility = _possibility;
                 if (currentPossibility <= 0)
                 {
                     currentPossibility = DefaultPossibility;
