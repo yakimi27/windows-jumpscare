@@ -106,18 +106,22 @@ namespace Desktop.Views
 		}
 
 
-        private void SaveSettings()
+        private void SaveSelectedJumpscare()
         {
-			if(_isLoading) return;
+            if (_isLoading) return;
 
             if (JumpscareComboBox.SelectedItem is string selectedName)
             {
                 _userManager.SetSelectedJumpscare(selectedName);
             }
+        }
+
+        private void SaveJumpscareChance()
+        {
+            if (_isLoading) return;
 
             int chance = MapSliderValueToChance(FrequencySlider.Value);
             _userManager.SetJumpscareChance(chance);
-            _loop?.UpdatePossibility(chance);
         }
 
         private async void UpdateCharacterPreview()
@@ -213,13 +217,13 @@ namespace Desktop.Views
         {
             if (_isLoading) return;
             UpdateCharacterPreview();
-            SaveSettings();
+            SaveSelectedJumpscare();
         }
 
         private void FrequencySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             if (_isLoading) return;
-            SaveSettings();
+            SaveJumpscareChance();
         }
 
         private void AutostartSwitch_Checked(object sender, RoutedEventArgs e)
