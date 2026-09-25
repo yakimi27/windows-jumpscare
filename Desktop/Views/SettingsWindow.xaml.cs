@@ -74,17 +74,31 @@ namespace Desktop.Views
 				{
 					JumpscareComboBox.SelectedItem = selectedJumpscare;
 				}
-				else if (JumpscareComboBox.Items.Count > 0)
+				else
 				{
-					JumpscareComboBox.SelectedIndex = 0;
+					var fallbackName = _jumpscareManager.GetFirstValidJumpscareName();
+					if (!string.IsNullOrEmpty(fallbackName) && JumpscareComboBox.Items.Contains(fallbackName))
+					{
+						JumpscareComboBox.SelectedItem = fallbackName;
+						_userManager.SetSelectedJumpscare(fallbackName);
+					}
+					else if (JumpscareComboBox.Items.Count > 0)
+					{
+						JumpscareComboBox.SelectedIndex = 0;
+						if (JumpscareComboBox.SelectedItem is string fallbackFromItems)
+						{
+							_userManager.SetSelectedJumpscare(fallbackFromItems);
+						}
+					}
 				}
 
 				int chance = _userManager.GetJumpscareChance();
 				FrequencySlider.Value = MapChanceToSliderValue(chance);
 
-				AutostartSwitch.IsChecked = _userManager.IsAutostartEnabled();
-
-				UpdateCharacterPreview();
+				if (JumpscareComboBox.SelectedItem == null)
+				{
+					UpdateCharacterPreview();
+				}
 			}
 			finally
 			{
