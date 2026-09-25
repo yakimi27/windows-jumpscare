@@ -56,6 +56,16 @@ namespace Desktop
             _userManager = new UserManager(_configService);
             _jumpscareManager = new JumpscareManager(_configService);
 
+            var currentJumpscare = _userManager.GetSelectedJumpscare();
+            if (_jumpscareManager.GetByName(currentJumpscare) == null)
+            {
+                var fallback = _jumpscareManager.GetFirstValidJumpscare();
+                if (fallback != null)
+                {
+                    _userManager.SetSelectedJumpscare(fallback.Name);
+                }
+            }
+
             _userManager.JumpscareChanged += OnJumpscareChanged;
             _userManager.JumpscareChanceChanged += OnJumpscareChanceChanged;
 
@@ -94,7 +104,8 @@ namespace Desktop
 
         private async Task LoadJumpscareAsync(string jumpscareName)
         {
-            var selectedJumpscare = _jumpscareManager.GetByName(jumpscareName);
+            var selectedJumpscare = _jumpscareManager.GetByName(jumpscareName)
+                ?? _jumpscareManager.GetFirstValidJumpscare();
             if (selectedJumpscare == null) return;
 
             if (_jumpscareWindow != null)
