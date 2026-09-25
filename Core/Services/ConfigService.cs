@@ -1,4 +1,6 @@
-﻿using Core.ConfigModels;
+using Core.ConfigModels;
+using System.Diagnostics;
+using System.IO;
 using System.Text.Json;
 
 namespace Core.Services
@@ -39,8 +41,28 @@ namespace Core.Services
                 var json = File.ReadAllText(filePath);
                 return JsonSerializer.Deserialize<T>(json, _jsonOptions) ?? new T();
             }
-            catch (JsonException)
+            catch (FileNotFoundException ex)
             {
+                Trace.TraceError($"Config file not found at '{filePath}': {ex}");
+                Debug.WriteLine($"Config file not found at '{filePath}': {ex}");
+                return new T();
+            }
+            catch (IOException ex)
+            {
+                Trace.TraceError($"IO error reading config file at '{filePath}': {ex}");
+                Debug.WriteLine($"IO error reading config file at '{filePath}': {ex}");
+                return new T();
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Trace.TraceError($"Access denied reading config file at '{filePath}': {ex}");
+                Debug.WriteLine($"Access denied reading config file at '{filePath}': {ex}");
+                return new T();
+            }
+            catch (JsonException ex)
+            {
+                Trace.TraceError($"JSON deserialization error in config file at '{filePath}': {ex}");
+                Debug.WriteLine($"JSON deserialization error in config file at '{filePath}': {ex}");
                 return new T();
             }
         }
