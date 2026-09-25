@@ -5,6 +5,7 @@ namespace Core.Interfaces
     public interface IUserManager
     {
         event Action<string>? JumpscareChanged;
+        event Action<int>? JumpscareChanceChanged;
         int GetJumpscareChance();
         string GetSelectedJumpscare();
 

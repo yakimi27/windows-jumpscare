@@ -8,6 +8,7 @@ namespace Core.Managers
     public class UserManager : IUserManager
     {
         public event Action<string>? JumpscareChanged;
+        public event Action<int>? JumpscareChanceChanged;
         private readonly IConfigService _configService;
         private UserModel _userModel;
 
@@ -43,6 +44,7 @@ namespace Core.Managers
         {
             _userModel.JumpscareChance = chance;
             Save();
+            JumpscareChanceChanged?.Invoke(chance);
         }
 
         public void SetSelectedJumpscare(string jumpscare)
