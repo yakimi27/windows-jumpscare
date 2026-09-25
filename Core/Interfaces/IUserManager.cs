@@ -5,12 +5,12 @@ namespace Core.Interfaces
     public interface IUserManager
     {
         event Action<string>? JumpscareChanged;
-        ushort GetJumpscareChance();
+        int GetJumpscareChance();
         string GetSelectedJumpscare();
 
         [SupportedOSPlatform("windows")]
         bool IsAutostartEnabled();
-        void SetJumpscareChance(ushort chance);
+        void SetJumpscareChance(int chance);
         void SetSelectedJumpscare(string jumpscare);
 
         [SupportedOSPlatform("windows")]

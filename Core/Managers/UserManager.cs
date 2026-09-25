@@ -17,7 +17,7 @@ namespace Core.Managers
             _userModel = _configService.Load<UserModel>(_configService.UserConfigFilePath) ?? new UserModel();
         }
 
-        public ushort GetJumpscareChance() => _userModel.JumpscareChance;
+        public int GetJumpscareChance() => _userModel.JumpscareChance;
         public string GetSelectedJumpscare() => _userModel.SelectedJumpscare;
         [SupportedOSPlatform("windows")]
         public bool IsAutostartEnabled()
@@ -39,7 +39,7 @@ namespace Core.Managers
             AutostartManager.SetAutostart(enable);
         }
 
-        public void SetJumpscareChance(ushort chance)
+        public void SetJumpscareChance(int chance)
         {
             _userModel.JumpscareChance = chance;
             Save();
