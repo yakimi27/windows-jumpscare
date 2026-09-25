@@ -171,9 +171,9 @@ namespace Desktop.Views
         {
             return chance switch
             {
-                >= 724817 => 1,
-                >= 349635 => 2,
-                >= 124818 => 3,
+                >= 874818 => 1,
+                >= 599635 => 2,
+                >= 349635 => 3,
                 _ => 4
             };
         }
@@ -183,9 +183,9 @@ namespace Desktop.Views
             return (int)Math.Round(sliderValue) switch
             {
                 1 => 1000000,
-                2 => 449635,
-                3 => 249635,
-                4 => 1,
+                2 => 749635,
+                3 => 449635,
+                4 => 249635,
                 _ => 749635
             };
         }
