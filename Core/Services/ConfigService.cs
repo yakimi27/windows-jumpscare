@@ -69,8 +69,42 @@ namespace Core.Services
 
         public void Save<T>(string filePath, T data)
         {
-            var json = JsonSerializer.Serialize(data, _jsonOptions);
-            File.WriteAllText(filePath, json);
+            var tempPath = filePath + ".tmp";
+            try
+            {
+                var json = JsonSerializer.Serialize(data, _jsonOptions);
+                File.WriteAllText(tempPath, json);
+                File.Move(tempPath, filePath, overwrite: true);
+            }
+            catch (IOException ex)
+            {
+                Trace.TraceError($"IO error writing config file at '{filePath}': {ex}");
+                Debug.WriteLine($"IO error writing config file at '{filePath}': {ex}");
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                Trace.TraceError($"Access denied writing config file at '{filePath}': {ex}");
+                Debug.WriteLine($"Access denied writing config file at '{filePath}': {ex}");
+            }
+            catch (JsonException ex)
+            {
+                Trace.TraceError($"JSON serialization error in config file at '{filePath}': {ex}");
+                Debug.WriteLine($"JSON serialization error in config file at '{filePath}': {ex}");
+            }
+            finally
+            {
+                try
+                {
+                    if (File.Exists(tempPath))
+                    {
+                        File.Delete(tempPath);
+                    }
+                }
+                catch
+                {
+                    // ignore errors during temp file cleanup
+                }
+            }
         }
 
         private void InitializeConfigDirectory()
