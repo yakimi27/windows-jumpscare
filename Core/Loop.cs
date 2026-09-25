@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Core
 {
     public class Loop
@@ -43,7 +45,15 @@ namespace Core
 
                 if (_random.Next(currentPossibility) == 0)
                 {
-                    await Trigger();
+                    try
+                    {
+                        await Trigger();
+                    }
+                    catch (Exception ex)
+                    {
+                        Trace.TraceError($"Error triggering jumpscare: {ex}");
+                        Debug.WriteLine($"Error triggering jumpscare: {ex}");
+                    }
                 }
 
                 await Task.Delay(3000);
