@@ -1,4 +1,4 @@
-using Core.ConfigModels;
+﻿using Core.ConfigModels;
 using Core.Interfaces;
 using Core.Services;
 using System.Runtime.Versioning;
@@ -12,10 +12,17 @@ namespace Core.Managers
         private readonly IConfigService _configService;
         private UserModel _userModel;
 
+        private const int DefaultJumpscareChance = 749635;
+
         public UserManager(IConfigService configService)
         {
             _configService = configService;
             _userModel = _configService.Load<UserModel>(_configService.UserConfigFilePath) ?? new UserModel();
+            if (_userModel.JumpscareChance <= 0)
+            {
+                _userModel.JumpscareChance = DefaultJumpscareChance;
+                Save();
+            }
         }
 
         public int GetJumpscareChance() => _userModel.JumpscareChance;
@@ -42,6 +49,10 @@ namespace Core.Managers
 
         public void SetJumpscareChance(int chance)
         {
+            if (chance <= 0)
+            {
+                chance = DefaultJumpscareChance;
+            }
             _userModel.JumpscareChance = chance;
             Save();
             JumpscareChanceChanged?.Invoke(chance);
