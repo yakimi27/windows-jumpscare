@@ -119,6 +119,8 @@ namespace Desktop.Views
             _isClosed = true;
             _isPlaying = false;
             _playbackTcs?.TrySetResult(true);
+            _screamSound.Stop();
+            _screamSound.Close();
         }
     }
 }
