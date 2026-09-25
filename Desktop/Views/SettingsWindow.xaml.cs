@@ -146,6 +146,8 @@ namespace Desktop.Views
 
             try
             {
+                _previewCache?.Release();
+                _previewCache = null;
                 _previewCache = new FrameCache(jumpscare.FrameAmount, jumpscare.AssetsPath, decodeWidth: 280);
 
                 await _previewCache.PreloadAsync();
@@ -257,6 +259,7 @@ namespace Desktop.Views
             _previewCts?.Cancel();
             _previewCts?.Dispose();
             _previewCache?.Release();
+            _previewCache = null;
         }
     }
 }
