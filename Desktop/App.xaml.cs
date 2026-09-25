@@ -57,6 +57,7 @@ namespace Desktop
             _jumpscareManager = new JumpscareManager(_configService);
 
             _userManager.JumpscareChanged += OnJumpscareChanged;
+            _userManager.JumpscareChanceChanged += OnJumpscareChanceChanged;
 
             await LoadJumpscareAsync(_userManager.GetSelectedJumpscare());
 
@@ -84,6 +85,11 @@ namespace Desktop
         private async void OnJumpscareChanged(string jumpscareName)
         {
             await LoadJumpscareAsync(jumpscareName);
+        }
+
+        private void OnJumpscareChanceChanged(int chance)
+        {
+            _loop.UpdatePossibility(chance);
         }
 
         private async Task LoadJumpscareAsync(string jumpscareName)
