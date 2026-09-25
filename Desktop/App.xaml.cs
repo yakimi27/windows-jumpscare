@@ -19,6 +19,7 @@ namespace Desktop
         private JumpscareWindow? _jumpscareWindow;
         private SettingsWindow? _settingsWindow;
         private byte _frameFrequency;
+        private readonly SemaphoreSlim _loadLock = new SemaphoreSlim(1, 1);
 
         [DllImport("kernel32.dll")]
         private static extern bool SetProcessWorkingSetSize(IntPtr handle, IntPtr minSize, IntPtr maxSize);
@@ -77,10 +78,23 @@ namespace Desktop
                 {
                     if (_jumpscareWindow != null && !_jumpscareWindow.IsPlaying)
                     {
-                        _jumpscareWindow.Show();
-                        await _jumpscareWindow.PlayAndHide(_frameFrequency);
-
-                        _jumpscareWindow.Hide();
+                        var window = _jumpscareWindow;
+                        window.Show();
+                        try
+                        {
+                            await window.PlayAndHide(_frameFrequency);
+                        }
+                        finally
+                        {
+                            try
+                            {
+                                window.Hide();
+                            }
+                            catch (InvalidOperationException)
+                            {
+                                // Window may have already closed
+                            }
+                        }
 
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
@@ -94,7 +108,14 @@ namespace Desktop
 
         private async void OnJumpscareChanged(string jumpscareName)
         {
-            await LoadJumpscareAsync(jumpscareName);
+            try
+            {
+                await LoadJumpscareAsync(jumpscareName);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to load jumpscare '{jumpscareName}': {ex.Message}");
+            }
         }
 
         private void OnJumpscareChanceChanged(int chance)
@@ -104,28 +125,43 @@ namespace Desktop
 
         private async Task LoadJumpscareAsync(string jumpscareName)
         {
-            var selectedJumpscare = _jumpscareManager.GetByName(jumpscareName)
-                ?? _jumpscareManager.GetFirstValidJumpscare();
-            if (selectedJumpscare == null) return;
-
-            if (_jumpscareWindow != null)
+            await _loadLock.WaitAsync();
+            try
             {
-                _jumpscareWindow.Close();
-                _jumpscareWindow = null;
+                var selectedJumpscare = _jumpscareManager.GetByName(jumpscareName)
+                    ?? _jumpscareManager.GetFirstValidJumpscare();
+                if (selectedJumpscare == null) return;
+
+                if (_jumpscareWindow != null)
+                {
+                    if (_jumpscareWindow.IsPlaying)
+                    {
+                        await _jumpscareWindow.WaitForPlaybackAsync();
+                    }
+
+                    _jumpscareWindow.Close();
+                    _jumpscareWindow = null;
+                }
+
+                FrameCache frameCache = new FrameCache(
+                    selectedJumpscare.FrameAmount,
+                    selectedJumpscare.AssetsPath,
+                    decodeWidth: 600);
+
+                var newWindow = new JumpscareWindow(frameCache, selectedJumpscare.AssetsPath);
+                _frameFrequency = selectedJumpscare.FrameFrequency;
+
+                await newWindow.PreloadAsync();
+                _jumpscareWindow = newWindow;
+
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+                TrimWorkingSet();
             }
-
-            FrameCache frameCache = new FrameCache(
-                selectedJumpscare.FrameAmount,
-                selectedJumpscare.AssetsPath,
-                decodeWidth: 600);
-
-            _jumpscareWindow = new JumpscareWindow(frameCache, selectedJumpscare.AssetsPath);
-            _frameFrequency = selectedJumpscare.FrameFrequency;
-
-            await _jumpscareWindow.PreloadAsync();
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            TrimWorkingSet();
+            finally
+            {
+                _loadLock.Release();
+            }
         }
 
         protected override void OnExit(ExitEventArgs e)

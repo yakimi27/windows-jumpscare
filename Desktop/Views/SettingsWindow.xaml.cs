@@ -244,6 +244,7 @@ namespace Desktop.Views
             if (_loop != null)
             {
                 TestJumpscareButton.IsEnabled = false;
+                JumpscareComboBox.IsEnabled = false;
                 try
                 {
                     await _loop.Trigger();
@@ -252,6 +253,7 @@ namespace Desktop.Views
                 finally
                 {
                     TestJumpscareButton.IsEnabled = true;
+                    JumpscareComboBox.IsEnabled = true;
                 }
             }
         }

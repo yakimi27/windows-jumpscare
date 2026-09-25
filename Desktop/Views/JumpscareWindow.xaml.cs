@@ -10,8 +10,10 @@ namespace Desktop.Views
     {
         private readonly FrameCache _cache;
         private bool _isPlaying = false;
+        private bool _isClosed = false;
         private MediaPlayer _screamSound = new MediaPlayer();
-        private IReadOnlyList<BitmapImage> _frames;
+        private IReadOnlyList<BitmapImage> _frames = Array.Empty<BitmapImage>();
+        private TaskCompletionSource<bool>? _playbackTcs;
 
         internal bool IsPlaying => _isPlaying;
 
@@ -46,35 +48,60 @@ namespace Desktop.Views
             _screamSound.Volume = 1.0;
         }
 
+        internal async Task WaitForPlaybackAsync()
+        {
+            while (_isPlaying)
+            {
+                var tcs = _playbackTcs;
+                if (tcs != null)
+                {
+                    await Task.WhenAny(tcs.Task, Task.Delay(5000));
+                }
+                else
+                {
+                    await Task.Delay(50);
+                }
+            }
+        }
+
         internal async Task PlayAndHide(byte frequency)
         {
-            if (_isPlaying) return;
+            if (_isPlaying || _isClosed) return;
             _isPlaying = true;
+            _playbackTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
             try
             {
-                JumpscareImage.Source = _frames[0];
+                if (_isClosed) return;
+                JumpscareImage.Source = _frames.Count > 0 ? _frames[0] : null;
                 await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render);
 
+                if (_isClosed) return;
                 Visibility = Visibility.Visible;
 
                 _ = PlaySound();
 
                 foreach (var frame in _frames)
                 {
+                    if (_isClosed) return;
                     JumpscareImage.Source = frame;
                     await Task.Delay(frequency);
                 }
 
+                if (_isClosed) return;
                 JumpscareImage.Source = null;
                 await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render);
                 await Dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background);
 
-                Visibility = Visibility.Hidden;
+                if (!_isClosed)
+                {
+                    Visibility = Visibility.Hidden;
+                }
             }
             finally
             {
                 _isPlaying = false;
+                _playbackTcs?.TrySetResult(true);
             }
         }
 
@@ -83,6 +110,14 @@ namespace Desktop.Views
             _screamSound.Position = TimeSpan.FromMilliseconds(1);
             _screamSound.Position = TimeSpan.Zero;
             _screamSound.Play();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            _isClosed = true;
+            _isPlaying = false;
+            _playbackTcs?.TrySetResult(true);
         }
     }
 }
