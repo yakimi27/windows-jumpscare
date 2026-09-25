@@ -104,6 +104,7 @@ namespace Desktop.Views
 
             int chance = MapSliderValueToChance(FrequencySlider.Value);
             _userManager.SetJumpscareChance(chance);
+            _loop?.UpdatePossibility(chance);
         }
 
         private async void UpdateCharacterPreview()
