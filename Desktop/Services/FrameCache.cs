@@ -59,9 +59,8 @@ namespace Desktop
 
         public void Release()
         {
+            _frames?.Clear();
             _frames = null;
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
         }
     }
 }
