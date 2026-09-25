@@ -19,7 +19,7 @@ namespace Desktop.Views
         private readonly IUserManager _userManager;
         private readonly IJumpscareManager _jumpscareManager;
         private readonly Loop? _loop;
-		private bool _isLoading;
+		private bool _isLoading = true;
         private CancellationTokenSource? _previewCts;
         private FrameCache? _previewCache;
 
@@ -97,10 +97,7 @@ namespace Desktop.Views
 
 				AutostartSwitch.IsChecked = _userManager.IsAutostartEnabled();
 
-				if (JumpscareComboBox.SelectedItem == null)
-				{
-					UpdateCharacterPreview();
-				}
+				UpdateCharacterPreview();
 			}
 			finally
 			{
@@ -214,12 +211,14 @@ namespace Desktop.Views
 
         private void JumpscareComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (_isLoading) return;
             UpdateCharacterPreview();
             SaveSettings();
         }
 
         private void FrequencySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
+            if (_isLoading) return;
             SaveSettings();
         }
 
