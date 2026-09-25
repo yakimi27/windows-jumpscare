@@ -14,22 +14,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="Assets\1.png" />
-		<None Remove="Assets\10.png" />
-		<None Remove="Assets\11.png" />
-		<None Remove="Assets\12.png" />
-		<None Remove="Assets\13.png" />
-		<None Remove="Assets\14.png" />
-		<None Remove="Assets\2.png" />
-		<None Remove="Assets\3.png" />
-		<None Remove="Assets\4.png" />
-		<None Remove="Assets\5.png" />
-		<None Remove="Assets\6.png" />
-		<None Remove="Assets\7.png" />
-		<None Remove="Assets\8.png" />
-		<None Remove="Assets\9.png" />
 		<None Remove="Assets\Icon\windowsJumpscare.ico" />
-		<None Remove="Assets\withered_foxy\0.png" />
 		<None Remove="Assets\withered_foxy\15.png" />
 		<None Remove="Assets\withered_freddy\1.png" />
 		<None Remove="Assets\withered_freddy\10.png" />
@@ -74,9 +59,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Resource Include="Assets\withered_foxy\0.png">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</Resource>
 		<Resource Include="Assets\withered_foxy\1.png">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
@@ -132,9 +114,6 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
 		<Resource Include="windowsJumpscare.ico" />
-		<Resource Include="Assets\withered_freddy\0.png">
-			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
-		</Resource>
 		<Resource Include="Assets\withered_freddy\1.png">
 		  <CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</Resource>
