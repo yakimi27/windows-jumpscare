@@ -72,6 +72,12 @@ namespace Core.Managers
         {
             _userModel = new UserModel();
             Save();
+            if (OperatingSystem.IsWindows())
+            {
+                AutostartManager.SetAutostart(false);
+            }
+            JumpscareChanged?.Invoke(_userModel.SelectedJumpscare);
+            JumpscareChanceChanged?.Invoke(_userModel.JumpscareChance);
         }
 
         private void Save() => _configService.Save(_configService.UserConfigFilePath, _userModel);
