@@ -35,7 +35,8 @@ namespace Desktop.Views
 
         internal async Task PreloadAsync()
         {
-            _frames = await _cache.PreloadAsync().ContinueWith(_ => _cache.Acquire());
+            await _cache.PreloadAsync();
+            _frames = _cache.Acquire();
 
             // prime
             if (_frames.Count > 0)
