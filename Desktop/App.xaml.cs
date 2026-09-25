@@ -73,7 +73,7 @@ namespace Desktop
 
             _loop.OnTriggered += () =>
             {
-                Dispatcher.Invoke(async () =>
+                return Dispatcher.InvokeAsync(async () =>
                 {
                     if (_jumpscareWindow != null && !_jumpscareWindow.IsPlaying)
                     {
@@ -86,7 +86,7 @@ namespace Desktop
                         GC.WaitForPendingFinalizers();
                         TrimWorkingSet();
                     }
-                });
+                }).Task.Unwrap();
             };
 
             _ = _loop.StartAsync(_userManager.GetJumpscareChance());
