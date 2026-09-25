@@ -1,4 +1,4 @@
-﻿using Core.ConfigModels;
+using Core.ConfigModels;
 using Core.Interfaces;
 using Core.Services;
 using System.Runtime.Versioning;
@@ -12,7 +12,7 @@ namespace Core.Managers
         private readonly IConfigService _configService;
         private UserModel _userModel;
 
-        private const int DefaultJumpscareChance = 749635;
+        public const int DefaultJumpscareChance = Constants.DefaultJumpscareChance;
 
         public UserManager(IConfigService configService)
         {

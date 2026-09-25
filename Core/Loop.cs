@@ -2,7 +2,7 @@ namespace Core
 {
     public class Loop
     {
-        private const int DefaultPossibility = 749635;
+        public const int DefaultPossibility = Constants.DefaultJumpscareChance;
         private readonly Random _random = new Random();
         private bool _running;
         private volatile int _posibility;

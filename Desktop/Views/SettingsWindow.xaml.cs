@@ -202,10 +202,10 @@ namespace Desktop.Views
             return (int)Math.Round(sliderValue) switch
             {
                 1 => 1000000,
-                2 => 749635,
+                2 => Constants.DefaultJumpscareChance,
                 3 => 449635,
                 4 => 249635,
-                _ => 749635
+                _ => Constants.DefaultJumpscareChance
             };
         }
 
