@@ -7,7 +7,7 @@ namespace Core
         private bool _running;
         private volatile int _posibility;
 
-        public event Action? OnTriggered;
+        public event Func<Task>? OnTriggered;
 
         public int JumpscareChance
         {
@@ -43,16 +43,25 @@ namespace Core
 
                 if (_random.Next(currentPossibility) == 0)
                 {
-                    OnTriggered?.Invoke();
+                    await Trigger();
                 }
 
                 await Task.Delay(3000);
             }
         }
-        public Task Trigger()
+
+        public async Task Trigger()
         {
-            OnTriggered?.Invoke();
-            return Task.CompletedTask;
+            if (OnTriggered != null)
+            {
+                var delegates = OnTriggered.GetInvocationList();
+                var tasks = new Task[delegates.Length];
+                for (int i = 0; i < delegates.Length; i++)
+                {
+                    tasks[i] = ((Func<Task>)delegates[i])() ?? Task.CompletedTask;
+                }
+                await Task.WhenAll(tasks);
+            }
         }
     }
 }
