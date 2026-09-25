@@ -95,6 +95,8 @@ namespace Desktop.Views
 				int chance = _userManager.GetJumpscareChance();
 				FrequencySlider.Value = MapChanceToSliderValue(chance);
 
+				AutostartSwitch.IsChecked = _userManager.IsAutostartEnabled();
+
 				if (JumpscareComboBox.SelectedItem == null)
 				{
 					UpdateCharacterPreview();
