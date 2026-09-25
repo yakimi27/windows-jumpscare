@@ -22,6 +22,7 @@ namespace Desktop.Views
 		private bool _isLoading = true;
         private CancellationTokenSource? _previewCts;
         private FrameCache? _previewCache;
+        private long _previewRequestId;
 
         internal SettingsWindow() : this(new ConfigService())
         {
@@ -126,44 +127,68 @@ namespace Desktop.Views
 
         private async void UpdateCharacterPreview()
         {
-            _previewCts?.Cancel();
-            _previewCts?.Dispose();
-            _previewCts = new CancellationTokenSource();
-            var token = _previewCts.Token;
-
-            if (JumpscareComboBox.SelectedItem is not string selectedName)
-            {
-                SetPreviewState(null);
-                return;
-            }
-
-            var jumpscare = _jumpscareManager.GetByName(selectedName);
-            if (jumpscare == null || string.IsNullOrEmpty(jumpscare.AssetsPath))
-            {
-                SetPreviewState(null);
-                return;
-            }
-
-            int frameIndex = 0;
-            int frameDelay = jumpscare.FrameFrequency > 0 ? jumpscare.FrameFrequency : 50;
+            CancellationTokenSource? cts = null;
+            FrameCache? localCache = null;
+            bool assignedToPreviewCache = false;
 
             try
             {
-                _previewCache?.Release();
-                _previewCache = null;
-                _previewCache = new FrameCache(jumpscare.FrameAmount, jumpscare.AssetsPath, decodeWidth: 280);
+                long requestId = ++_previewRequestId;
 
-                await _previewCache.PreloadAsync();
-                if (token.IsCancellationRequested) return;
+                try
+                {
+                    _previewCts?.Cancel();
+                }
+                catch (ObjectDisposedException)
+                {
+                }
 
-                var frames = _previewCache.Acquire();
-                if (frames.Count == 0)
+                cts = new CancellationTokenSource();
+                _previewCts = cts;
+                var token = cts.Token;
+
+                if (JumpscareComboBox.SelectedItem is not string selectedName)
                 {
                     SetPreviewState(null);
+                    _previewCache?.Release();
+                    _previewCache = null;
                     return;
                 }
 
-                while (!token.IsCancellationRequested)
+                var jumpscare = _jumpscareManager.GetByName(selectedName);
+                if (jumpscare == null || string.IsNullOrEmpty(jumpscare.AssetsPath))
+                {
+                    SetPreviewState(null);
+                    _previewCache?.Release();
+                    _previewCache = null;
+                    return;
+                }
+
+                int frameIndex = 0;
+                int frameDelay = jumpscare.FrameFrequency > 0 ? jumpscare.FrameFrequency : 50;
+
+                localCache = new FrameCache(jumpscare.FrameAmount, jumpscare.AssetsPath, decodeWidth: 280);
+                await localCache.PreloadAsync();
+
+                if (token.IsCancellationRequested || _previewCts != cts || requestId != _previewRequestId)
+                {
+                    return;
+                }
+
+                var frames = localCache.Acquire();
+                if (frames.Count == 0)
+                {
+                    SetPreviewState(null);
+                    _previewCache?.Release();
+                    _previewCache = null;
+                    return;
+                }
+
+                _previewCache?.Release();
+                _previewCache = localCache;
+                assignedToPreviewCache = true;
+
+                while (!token.IsCancellationRequested && requestId == _previewRequestId)
                 {
                     SetPreviewState(frames[frameIndex]);
                     frameIndex = (frameIndex + 1) % frames.Count;
@@ -178,6 +203,24 @@ namespace Desktop.Views
             catch
             {
                 SetPreviewState(null);
+                _previewCache?.Release();
+                _previewCache = null;
+            }
+            finally
+            {
+                if (!assignedToPreviewCache)
+                {
+                    localCache?.Release();
+                }
+
+                if (cts != null)
+                {
+                    if (_previewCts == cts)
+                    {
+                        _previewCts = null;
+                    }
+                    cts.Dispose();
+                }
             }
         }
 
@@ -263,8 +306,14 @@ namespace Desktop.Views
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
-            _previewCts?.Cancel();
-            _previewCts?.Dispose();
+            try
+            {
+                _previewCts?.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            _previewCts = null;
             _previewCache?.Release();
             _previewCache = null;
         }
