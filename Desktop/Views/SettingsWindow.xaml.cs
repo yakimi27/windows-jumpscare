@@ -79,7 +79,7 @@ namespace Desktop.Views
 					JumpscareComboBox.SelectedIndex = 0;
 				}
 
-				ushort chance = _userManager.GetJumpscareChance();
+				int chance = _userManager.GetJumpscareChance();
 				FrequencySlider.Value = MapChanceToSliderValue(chance);
 
 				AutostartSwitch.IsChecked = _userManager.IsAutostartEnabled();
@@ -102,7 +102,7 @@ namespace Desktop.Views
                 _userManager.SetSelectedJumpscare(selectedName);
             }
 
-            ushort chance = MapSliderValueToChance(FrequencySlider.Value);
+            int chance = MapSliderValueToChance(FrequencySlider.Value);
             _userManager.SetJumpscareChance(chance);
         }
 
@@ -166,26 +166,26 @@ namespace Desktop.Views
             CharacterPreviewImage.Source = source;
             PreviewPlaceholderText.Visibility = source != null ? Visibility.Collapsed : Visibility.Visible;
         }
-        private static double MapChanceToSliderValue(ushort chance)
+        private static double MapChanceToSliderValue(int chance)
         {
             return chance switch
             {
-                >= 49152 => 1,
-                >= 32768 => 2,
-                >= 16384 => 3,
+                >= 724817 => 1,
+                >= 349635 => 2,
+                >= 124818 => 3,
                 _ => 4
             };
         }
 
-        private static ushort MapSliderValueToChance(double sliderValue)
+        private static int MapSliderValueToChance(double sliderValue)
         {
             return (int)Math.Round(sliderValue) switch
             {
-                1 => 65535,
-                2 => 32768,
-                3 => 16384,
+                1 => 1000000,
+                2 => 449635,
+                3 => 249635,
                 4 => 1,
-                _ => 32768
+                _ => 749635
             };
         }
 
@@ -202,24 +202,6 @@ namespace Desktop.Views
         private void FrequencySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             SaveSettings();
-        }
-
-        private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
-			if(_isLoading) return;
-            // Scaffold: Handle volume slider value change
-        }
-
-        private void MuteSwitch_Checked(object sender, RoutedEventArgs e)
-        {
-			if(_isLoading) return;
-            // Scaffold: Handle mute toggle checked
-        }
-
-        private void MuteSwitch_Unchecked(object sender, RoutedEventArgs e)
-        {
-			if(_isLoading) return;
-            // Scaffold: Handle mute toggle unchecked
         }
 
         private void AutostartSwitch_Checked(object sender, RoutedEventArgs e)

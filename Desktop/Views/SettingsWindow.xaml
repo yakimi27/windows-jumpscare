@@ -83,9 +83,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -139,46 +136,25 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="Rare" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Left"/>
-                <TextBlock Grid.Column="1" Text="Balanced" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Center"/>
-                <TextBlock Grid.Column="2" Text="Frequent" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Center"/>
-                <TextBlock Grid.Column="3" Text="Insane" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Right"/>
+                <TextBlock Grid.Column="1" Text="Default" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="Increased" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="3" Text="Frequent" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Right"/>
             </Grid>
         </StackPanel>
 
-        <!-- volume -->
-        <StackPanel Grid.Row="3" Grid.Column="0" Margin="0,0,24,16" VerticalAlignment="Top">
-            <TextBlock Text="Audio Settings" FontSize="14" FontWeight="SemiBold"/>
-            <TextBlock Text="Adjust volume &amp; sound mute" FontSize="12" 
-                       Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Margin="0,2,0,0"/>
-        </StackPanel>
-        <Grid Grid.Row="3" Grid.Column="1" Margin="0,0,0,16">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Slider x:Name="VolumeSlider" Grid.Column="0" Minimum="0" Maximum="100" Value="80" 
-                    VerticalAlignment="Center" Margin="0,0,16,0"
-                    AutomationProperties.Name="Audio Volume Slider"
-                    ValueChanged="VolumeSlider_ValueChanged"/>
-            <CheckBox x:Name="MuteSwitch" Grid.Column="1" Style="{StaticResource ToggleSwitchStyle}" 
-                      VerticalAlignment="Center" Content="Mute"
-                      AutomationProperties.Name="Mute Audio Toggle"
-                      Checked="MuteSwitch_Checked" Unchecked="MuteSwitch_Unchecked"/>
-        </Grid>
-
         <!-- autostart -->
-        <StackPanel Grid.Row="4" Grid.Column="0" Margin="0,0,24,16" VerticalAlignment="Top">
+        <StackPanel Grid.Row="3" Grid.Column="0" Margin="0,0,24,16" VerticalAlignment="Top">
             <TextBlock Text="Autostart" FontSize="14" FontWeight="SemiBold"/>
             <TextBlock Text="Run automatically on system startup" FontSize="12" 
                        Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Margin="0,2,0,0"/>
         </StackPanel>
-        <CheckBox x:Name="AutostartSwitch" Grid.Row="4" Grid.Column="1" 
+        <CheckBox x:Name="AutostartSwitch" Grid.Row="3" Grid.Column="1" 
                   Style="{StaticResource ToggleSwitchStyle}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,0,16"
                   AutomationProperties.Name="Autostart Background Service Switch"
                   Checked="AutostartSwitch_Checked" Unchecked="AutostartSwitch_Unchecked"/>
 
         <!-- test jumpscare -->
-        <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,16" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right">
             <Button x:Name="TestJumpscareButton" Content="⚡ Test Jumpscare" Height="36" Padding="20,6" 
                     FontWeight="SemiBold" FontSize="14" Foreground="White" 
                     Background="{StaticResource SystemControlHighlightAccentBrush}" BorderThickness="0" 
@@ -186,20 +162,5 @@
                     AutomationProperties.Name="Test Jumpscare Button"
                     Click="TestJumpscareButton_Click"/>
         </StackPanel>
-
-        <Rectangle Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Height="1" 
-                   Fill="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" 
-                   Margin="0,0,0,16" Opacity="0.5"/>
-
-        <!-- status -->
-        <Border Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" CornerRadius="12" 
-                Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" 
-                Padding="12,6" HorizontalAlignment="Left">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Ellipse Width="8" Height="8" Fill="#107C41" Margin="0,0,8,0"/>
-                <TextBlock Text="Status: Active in system tray" FontSize="12" 
-                           Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" FontWeight="Medium"/>
-            </StackPanel>
-        </Border>
     </Grid>
 </Window>
