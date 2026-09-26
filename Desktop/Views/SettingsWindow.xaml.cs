@@ -293,6 +293,10 @@ namespace Desktop.Views
                     await _loop.Trigger();
                     await Task.Delay(500);
                 }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error triggering test jumpscare: {ex}");
+                }
                 finally
                 {
                     TestJumpscareButton.IsEnabled = true;

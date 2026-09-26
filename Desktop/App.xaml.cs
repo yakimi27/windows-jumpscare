@@ -49,7 +49,17 @@ namespace Desktop
 
             var contextMenu = new ContextMenuStrip();
             contextMenu.Items.Add("Show", null, (s, args) => ShowMainWindow());
-            contextMenu.Items.Add("Trigger jumpscare", null, onClick: async (s, args) => await _loop.Trigger());
+            contextMenu.Items.Add("Trigger jumpscare", null, onClick: async (s, args) =>
+            {
+                try
+                {
+                    await _loop.Trigger();
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error triggering jumpscare from tray: {ex}");
+                }
+            });
             contextMenu.Items.Add("Exit", null, (s, args) => Shutdown());
             _trayIcon.ContextMenuStrip = contextMenu;
             _trayIcon.DoubleClick += (s, args) => ShowMainWindow();
