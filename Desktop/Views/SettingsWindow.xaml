@@ -102,11 +102,14 @@
             <ComboBox x:Name="JumpscareComboBox" Height="32" VerticalContentAlignment="Center"
                       AutomationProperties.Name="Selected Jumpscare Character"
                       SelectionChanged="JumpscareComboBox_SelectionChanged"/>
-            <Border Margin="0,8,0,0" CornerRadius="8" Padding="8" 
+            <Border Margin="0,8,0,0" CornerRadius="8" 
                     Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" 
                     BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}" 
                     BorderThickness="1" HorizontalAlignment="Left" Width="140" Height="100">
                 <Grid>
+                    <Grid.Clip>
+                        <RectangleGeometry RadiusX="7" RadiusY="7" Rect="0,0,138,98"/>
+                    </Grid.Clip>
                     <Image x:Name="CharacterPreviewImage" Stretch="UniformToFill" 
                            RenderOptions.BitmapScalingMode="HighQuality"
                            AutomationProperties.Name="Character Visual Preview"/>
