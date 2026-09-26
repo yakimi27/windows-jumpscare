@@ -1,11 +1,21 @@
-﻿namespace Core.Interfaces
+using System.Runtime.Versioning;
+
+namespace Core.Interfaces
 {
     public interface IUserManager
     {
-        ushort GetJumpscareChance();
+        event Action<string>? JumpscareChanged;
+        event Action<int>? JumpscareChanceChanged;
+        int GetJumpscareChance();
         string GetSelectedJumpscare();
-        void SetJumpscareChance(ushort chance);
+
+        [SupportedOSPlatform("windows")]
+        bool IsAutostartEnabled();
+        void SetJumpscareChance(int chance);
         void SetSelectedJumpscare(string jumpscare);
+
+        [SupportedOSPlatform("windows")]
+        void SetAutostart(bool enable);
         void Reset();
     }
 }

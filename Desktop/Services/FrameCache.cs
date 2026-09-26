@@ -1,6 +1,6 @@
-﻿using System.Windows.Media.Imaging;
+using System.Windows.Media.Imaging;
 
-namespace Overlay
+namespace Desktop
 {
     internal class FrameCache
     {
@@ -21,7 +21,7 @@ namespace Overlay
             if (_frames != null) return _frames;
 
             _frames = new List<BitmapImage>();
-            for (byte i = 1; i <= _frameQuantity; i++)
+            for (int i = 1; i <= _frameQuantity; i++)
             {
                 _frames.Add(CreateFrame(i));
             }
@@ -35,7 +35,7 @@ namespace Overlay
             await Task.Run(() =>
             {
                 var frames = new List<BitmapImage>();
-                for (byte i = 1; i <= _frameQuantity; i++)
+                for (int i = 1; i <= _frameQuantity; i++)
                 {
                     frames.Add(CreateFrame(i));
                 }
@@ -43,7 +43,7 @@ namespace Overlay
             });
         }
 
-        private BitmapImage CreateFrame(byte index)
+        private BitmapImage CreateFrame(int index)
         {
             var bitmap = new BitmapImage();
             bitmap.BeginInit();
@@ -59,9 +59,8 @@ namespace Overlay
 
         public void Release()
         {
+            _frames?.Clear();
             _frames = null;
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Core.ConfigModels;
+using Core.ConfigModels;
 using Core.Interfaces;
 using Core.Services;
 
@@ -13,11 +13,16 @@ namespace Core.Managers
         {
             _configService = configService;
             _jumpscareList = _configService.Load<JumpscareModel.JumpscareList>(_configService.JumpscareConfigFilePath) ?? new JumpscareModel.JumpscareList { Jumpscares = [] };
+            _jumpscareList.Jumpscares ??= [];
         }
 
         public IReadOnlyList<JumpscareModel.Jumpscare> GetAll() => _jumpscareList.Jumpscares;
 
         public JumpscareModel.Jumpscare? GetByName(string name) => _jumpscareList.Jumpscares.FirstOrDefault(j => j.Name == name);
+
+        public JumpscareModel.Jumpscare? GetFirstValidJumpscare() => _jumpscareList.Jumpscares.FirstOrDefault(j => !string.IsNullOrWhiteSpace(j.Name));
+
+        public string? GetFirstValidJumpscareName() => GetFirstValidJumpscare()?.Name;
 
         public void Add(JumpscareModel.Jumpscare jumpscare)
         {
