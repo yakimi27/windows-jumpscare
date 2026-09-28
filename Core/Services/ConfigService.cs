@@ -122,6 +122,7 @@ namespace Core.Services
                         new() {Name = "Withered Freddy", AssetsPath = "assets/withered_freddy", FrameAmount = 36, FrameFrequency = 50},
                         new () {Name = "Withered Bonnie", AssetsPath = "assets/withered_bonnie", FrameAmount = 16, FrameFrequency = 50},
                         new () {Name = "Withered Chica", AssetsPath = "assets/withered_chica", FrameAmount = 12, FrameFrequency = 60},
+                        new () {Name = "Withered Golden Freddy", AssetsPath = "assets/withered_golden_freddy", FrameAmount = 13, FrameFrequency = 60},
                         new () {Name = "Mangle", AssetsPath = "assets/mangle", FrameAmount = 16, FrameFrequency = 60}
                         ]
                 });
