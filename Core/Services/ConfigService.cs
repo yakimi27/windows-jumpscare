@@ -118,8 +118,9 @@ namespace Core.Services
                 Save(_jumpscareConfigFilePath, new JumpscareModel.JumpscareList
                 {
                     Jumpscares = [
-                        new () {Name = "Withered Foxy", AssetsPath = "assets/withered_foxy", FrameAmount = 15, FrameFrequency= 60},
-                        new() {Name = "Withered Freddy", AssetsPath = "assets/withered_freddy", FrameAmount = 36, FrameFrequency= 50}
+                        new () {Name = "Withered Foxy", AssetsPath = "assets/withered_foxy", FrameAmount = 15, FrameFrequency = 60},
+                        new() {Name = "Withered Freddy", AssetsPath = "assets/withered_freddy", FrameAmount = 36, FrameFrequency = 50},
+                        new () {Name = "Withered Bonnie", AssetsPath = "assets/withered_bonnie", FrameAmount = 16, FrameFrequency = 50}
                         ]
                 });
         }
