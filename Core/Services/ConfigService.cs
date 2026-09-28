@@ -120,7 +120,8 @@ namespace Core.Services
                     Jumpscares = [
                         new () {Name = "Withered Foxy", AssetsPath = "assets/withered_foxy", FrameAmount = 15, FrameFrequency = 60},
                         new() {Name = "Withered Freddy", AssetsPath = "assets/withered_freddy", FrameAmount = 36, FrameFrequency = 50},
-                        new () {Name = "Withered Bonnie", AssetsPath = "assets/withered_bonnie", FrameAmount = 16, FrameFrequency = 50}
+                        new () {Name = "Withered Bonnie", AssetsPath = "assets/withered_bonnie", FrameAmount = 16, FrameFrequency = 50},
+                        new () {Name = "Withered Chica", AssetsPath = "assets/withered_chica", FrameAmount = 12, FrameFrequency = 60}
                         ]
                 });
         }
