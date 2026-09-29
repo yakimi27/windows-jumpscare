@@ -133,7 +133,8 @@ namespace Core.Services
                         new () {Name = "Springtrap (from center)", AssetsPath = "assets/springtrap_from_center", FrameAmount = 41, FrameFrequency = 60},
                         new () {Name = "Phantom Freddy", AssetsPath = "assets/phantom_freddy", FrameAmount = 21, FrameFrequency = 50},
                         new () {Name = "Phantom Baloon Boy", AssetsPath = "assets/phantom_baloon_boy", FrameAmount = 12, FrameFrequency = 50},
-                        new () {Name = "Phantom Chica", AssetsPath = "assets/phantom_chica", FrameAmount = 16, FrameFrequency = 50}
+                        new () {Name = "Phantom Chica", AssetsPath = "assets/phantom_chica", FrameAmount = 16, FrameFrequency = 50},
+                        new () {Name = "Phantom Foxy", AssetsPath = "assets/phantom_foxy", FrameAmount = 13, FrameFrequency = 50}
                         ]
                 });
         }
