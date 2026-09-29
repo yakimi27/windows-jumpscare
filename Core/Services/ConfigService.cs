@@ -1,4 +1,4 @@
-using Core.ConfigModels;
+﻿using Core.ConfigModels;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
@@ -128,7 +128,9 @@ namespace Core.Services
                         new () {Name = "Toy Freddy", AssetsPath = "assets/toy_freddy", FrameAmount = 18, FrameFrequency = 60},
                         new () {Name = "Toy Bonnie", AssetsPath = "assets/toy_bonnie", FrameAmount = 13, FrameFrequency = 60},
                         new () {Name = "Toy Chica", AssetsPath = "assets/toy_chica", FrameAmount = 13, FrameFrequency = 50},
-                        new () {Name = "Phantom Puppet", AssetsPath = "assets/phantom_puppet", FrameAmount = 9, FrameFrequency = 85}
+                        new () {Name = "Phantom Puppet", AssetsPath = "assets/phantom_puppet", FrameAmount = 9, FrameFrequency = 85},
+                        new () {Name = "Springtrap (from right)", AssetsPath = "assets/springtrap_from_right", FrameAmount = 41, FrameFrequency = 40},
+                        new () {Name = "Springtrap (from center)", AssetsPath = "assets/springtrap_from_center", FrameAmount = 41, FrameFrequency = 60}
                         ]
                 });
         }
