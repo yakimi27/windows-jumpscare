@@ -18,7 +18,7 @@ namespace Desktop
         private NotifyIcon _trayIcon = null!;
         private JumpscareWindow? _jumpscareWindow;
         private SettingsWindow? _settingsWindow;
-        private byte _frameFrequency;
+        private ushort _frameFrequency;
         private readonly SemaphoreSlim _loadLock = new SemaphoreSlim(1, 1);
 
         [DllImport("kernel32.dll")]

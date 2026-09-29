@@ -11,7 +11,7 @@ namespace Core.ConfigModels
             public string Name { get; set; } = string.Empty;
             public string AssetsPath { get; set; } = string.Empty;
             public byte FrameAmount { get; set; }
-            public byte FrameFrequency { get; set; }
+            public ushort FrameFrequency { get; set; }
         }
     }
 }

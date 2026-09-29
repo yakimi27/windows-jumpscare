@@ -65,7 +65,7 @@ namespace Desktop.Views
             }
         }
 
-        internal async Task PlayAndHide(byte frequency)
+        internal async Task PlayAndHide(ushort frequency)
         {
             if (_isPlaying || _isClosed) return;
             _isPlaying = true;
