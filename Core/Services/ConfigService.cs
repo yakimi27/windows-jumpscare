@@ -1,4 +1,4 @@
-using Core.ConfigModels;
+﻿using Core.ConfigModels;
 using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
@@ -118,9 +118,25 @@ namespace Core.Services
                 Save(_jumpscareConfigFilePath, new JumpscareModel.JumpscareList
                 {
                     Jumpscares = [
-                        new () {Name = "Withered Foxy", AssetsPath = "assets/withered_foxy", FrameAmount = 15, FrameFrequency= 60},
-                        new() {Name = "Withered Freddy", AssetsPath = "assets/withered_freddy", FrameAmount = 36, FrameFrequency= 50}
-                        ]
+                        new () {Name = "Toy Freddy", AssetsPath = "assets/toy_freddy", FrameAmount = 18, FrameFrequency = 60},
+                        new () {Name = "Toy Bonnie", AssetsPath = "assets/toy_bonnie", FrameAmount = 13, FrameFrequency = 60},
+                        new () {Name = "Toy Chica", AssetsPath = "assets/toy_chica", FrameAmount = 13, FrameFrequency = 50},
+                        new () {Name = "Mangle", AssetsPath = "assets/mangle", FrameAmount = 16, FrameFrequency = 60},
+                        new () {Name = "Withered Freddy", AssetsPath = "assets/withered_freddy", FrameAmount = 36, FrameFrequency = 50},
+                        new () {Name = "Withered Bonnie", AssetsPath = "assets/withered_bonnie", FrameAmount = 16, FrameFrequency = 50},
+                        new () {Name = "Withered Chica", AssetsPath = "assets/withered_chica", FrameAmount = 12, FrameFrequency = 60},
+                        new () {Name = "Withered Foxy", AssetsPath = "assets/withered_foxy", FrameAmount = 15, FrameFrequency = 60},
+                        new () {Name = "The Puppet", AssetsPath = "assets/the_puppet", FrameAmount = 15, FrameFrequency = 50},
+                        new () {Name = "Withered Golden Freddy", AssetsPath = "assets/withered_golden_freddy", FrameAmount = 13, FrameFrequency = 60},
+
+                        new () {Name = "Springtrap (from center)", AssetsPath = "assets/springtrap_from_center", FrameAmount = 41, FrameFrequency = 60},
+                        new () {Name = "Springtrap (from right)", AssetsPath = "assets/springtrap_from_right", FrameAmount = 41, FrameFrequency = 40},
+                        new () {Name = "Phantom Freddy", AssetsPath = "assets/phantom_freddy", FrameAmount = 21, FrameFrequency = 50},
+                        new () {Name = "Phantom Chica", AssetsPath = "assets/phantom_chica", FrameAmount = 16, FrameFrequency = 50},
+                        new () {Name = "Phantom Foxy", AssetsPath = "assets/phantom_foxy", FrameAmount = 13, FrameFrequency = 50},
+                        new () {Name = "Phantom Balloon Boy", AssetsPath = "assets/phantom_balloon_boy", FrameAmount = 12, FrameFrequency = 50},
+                        new () {Name = "Phantom Puppet", AssetsPath = "assets/phantom_puppet", FrameAmount = 9, FrameFrequency = 444}
+                    ]
                 });
         }
     }
