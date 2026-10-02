@@ -2,6 +2,7 @@
 bin/
 obj/
 out/
+*.iss
 *_DRAFT.md
 *.pdb
 *.exe
