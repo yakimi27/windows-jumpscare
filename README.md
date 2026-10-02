@@ -30,9 +30,9 @@ Choose the distribution format that best fits your needs:
 
 | Package | Type | Prerequisites | Description |
 |:---|:---:|:---:|:---|
-| **[WindowsJumpscare-Setup.exe](#)** | **Installer** | *None* | **Recommended.** Guided setup wizard, creates Start Menu shortcuts and optional Desktop icon, includes full uninstaller. |
-| **[WindowsJumpscare-SelfContained.zip](#)** | **Portable** | *None* | Standalone portable bundle. Pre-packaged with the .NET 10 runtime — extract and run anywhere without installing anything. |
-| **[WindowsJumpscare-FrameworkDependent.zip](#)** | **Portable (Lightweight)** | [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) | Minimal file size download for users who already have .NET 10 installed on their system. |
+| **[WindowsJumpscare-Setup.exe](https://github.com/yakimi27/windows-jumpscare/releases)** | **Installer** | *None* | **Recommended.** Guided setup wizard, creates Start Menu shortcuts and optional Desktop icon, includes full uninstaller. |
+| **[WindowsJumpscare-SelfContained.zip](https://github.com/yakimi27/windows-jumpscare/releases)** | **Portable** | *None* | Standalone portable bundle. Pre-packaged with the .NET 10 runtime — extract and run anywhere without installing anything. |
+| **[WindowsJumpscare-FrameworkDependent.zip](https://github.com/yakimi27/windows-jumpscare/releases)** | **Portable (Lightweight)** | [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) | Minimal file size download for users who already have .NET 10 installed on their system. |
 
 ---
 
@@ -48,6 +48,8 @@ Choose the distribution format that best fits your needs:
 - **Windows Autostart Integration**: One-click toggle switch to register or unregister the app in Windows Startup registry (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run`).
 - **Near-Zero Memory Footprint**: Uses pre-cached bitmap frames, aggressive garbage collection, and Win32 working-set memory trimming (`SetProcessWorkingSetSize`) to idle at negligible RAM usage.
 - **Fully Extensible via JSON**: Add custom creatures, custom image sequences, frame rates, and sound effects via simple JSON configuration.
+
+https://github.com/user-attachments/assets/5c2a31c7-91f1-40b5-80c1-8bdb9ce36ce8
 
 ---
 
