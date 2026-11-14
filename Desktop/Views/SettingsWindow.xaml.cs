@@ -236,7 +236,8 @@ namespace Desktop.Views
                 >= 874818 => 1,
                 >= 599635 => 2,
                 >= 349635 => 3,
-                _ => 4
+                >= 174635 => 4,
+                _ => 5
             };
         }
 
@@ -248,6 +249,7 @@ namespace Desktop.Views
                 2 => Constants.DefaultJumpscareChance,
                 3 => 449635,
                 4 => 249635,
+                5 => 99635,
                 _ => Constants.DefaultJumpscareChance
             };
         }

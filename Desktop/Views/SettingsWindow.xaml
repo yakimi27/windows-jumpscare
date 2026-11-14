@@ -110,7 +110,7 @@
                     <Grid.Clip>
                         <RectangleGeometry RadiusX="7" RadiusY="7" Rect="0,0,138,98"/>
                     </Grid.Clip>
-                    <Image x:Name="CharacterPreviewImage" Stretch="UniformToFill" 
+                    <Image x:Name="CharacterPreviewImage" Stretch="UniformToFill"
                            RenderOptions.BitmapScalingMode="HighQuality"
                            AutomationProperties.Name="Character Visual Preview"/>
                     <TextBlock x:Name="PreviewPlaceholderText" Text="Preview Thumbnail" FontSize="11" 
@@ -127,7 +127,7 @@
                        Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" Margin="0,2,0,0"/>
         </StackPanel>
         <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,0,0,16">
-            <Slider x:Name="FrequencySlider" Minimum="1" Maximum="4" Value="2" 
+            <Slider x:Name="FrequencySlider" Minimum="1" Maximum="5" Value="2"
                     TickFrequency="1" IsSnapToTickEnabled="True" TickPlacement="BottomRight"
                     AutomationProperties.Name="Jumpscare Trigger Frequency"
                     ValueChanged="FrequencySlider_ValueChanged"/>
@@ -137,11 +137,13 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" Text="Rare" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Left"/>
                 <TextBlock Grid.Column="1" Text="Default" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Center"/>
                 <TextBlock Grid.Column="2" Text="Increased" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Center"/>
-                <TextBlock Grid.Column="3" Text="Frequent" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Right"/>
+                <TextBlock Grid.Column="3" Text="Frequent" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="4" Text="Fast" FontSize="11" Foreground="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" HorizontalAlignment="Right"/>
             </Grid>
         </StackPanel>
 
