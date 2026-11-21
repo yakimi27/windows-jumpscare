@@ -22,6 +22,7 @@ namespace Desktop.Views
         private TaskCompletionSource<bool>? _playbackTcs;
 
         internal bool IsPlaying => _isPlaying;
+        internal bool IsClosed => _isClosed;
         internal FrameCache Cache => _cache;
         internal string AssetsPath => _assetsPath;
 

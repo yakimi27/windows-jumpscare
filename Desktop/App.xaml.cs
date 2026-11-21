@@ -86,79 +86,107 @@ namespace Desktop
             {
                 return Dispatcher.InvokeAsync(async () =>
                 {
-                    if (_jumpscareWindow != null && !_jumpscareWindow.IsPlaying)
+                    await _loadLock.WaitAsync();
+                    try
                     {
-                        var primaryWindow = _jumpscareWindow;
-                        var cursorScreen = System.Windows.Forms.Screen.FromPoint(
-                            System.Windows.Forms.Cursor.Position);
-                        var allScreens = System.Windows.Forms.Screen.AllScreens;
-
-                        primaryWindow.PositionOnScreen(cursorScreen);
-
-                        var extraWindows = new List<JumpscareWindow>();
-                        bool matchedCursorScreen = false;
-                        foreach (var screen in allScreens)
+                        var primaryWindow = Volatile.Read(ref _jumpscareWindow);
+                        if (primaryWindow != null && !primaryWindow.IsPlaying && !primaryWindow.IsClosed)
                         {
-                            if (!matchedCursorScreen && string.Equals(
-                                    screen.DeviceName,
-                                    cursorScreen.DeviceName,
-                                    StringComparison.OrdinalIgnoreCase))
+                            var cursorScreen = System.Windows.Forms.Screen.FromPoint(
+                                System.Windows.Forms.Cursor.Position);
+                            var allScreens = System.Windows.Forms.Screen.AllScreens;
+
+                            primaryWindow.PositionOnScreen(cursorScreen);
+
+                            var extraWindows = new List<JumpscareWindow>();
+                            bool matchedCursorScreen = false;
+                            foreach (var screen in allScreens)
                             {
-                                matchedCursorScreen = true;
-                                continue;
+                                if (!matchedCursorScreen && string.Equals(
+                                        screen.DeviceName,
+                                        cursorScreen.DeviceName,
+                                        StringComparison.OrdinalIgnoreCase))
+                                {
+                                    matchedCursorScreen = true;
+                                    continue;
+                                }
+
+                                var overlay = new JumpscareWindow(
+                                    primaryWindow.Cache,
+                                    primaryWindow.AssetsPath,
+                                    playAudio: false);
+                                await overlay.PreloadAsync();
+                                overlay.PositionOnScreen(screen);
+                                extraWindows.Add(overlay);
                             }
 
-                            var overlay = new JumpscareWindow(
-                                primaryWindow.Cache,
-                                primaryWindow.AssetsPath,
-                                playAudio: false);
-                            await overlay.PreloadAsync();
-                            overlay.PositionOnScreen(screen);
-                            extraWindows.Add(overlay);
-                        }
-
-                        var allWindows = new List<JumpscareWindow>(1 + extraWindows.Count)
-                        {
-                            primaryWindow
-                        };
-                        allWindows.AddRange(extraWindows);
-
-                        foreach (var window in allWindows)
-                        {
-                            window.Show();
-                        }
-
-                        try
-                        {
-                            await Task.WhenAll(allWindows.Select(w => w.PlayAndHide(_frameFrequency)));
-                        }
-                        finally
-                        {
-                            try
+                            var allWindows = new List<JumpscareWindow>(1 + extraWindows.Count)
                             {
-                                primaryWindow.Hide();
-                            }
-                            catch (InvalidOperationException)
-                            {
-                                // Window may have already closed
-                            }
+                                primaryWindow
+                            };
+                            allWindows.AddRange(extraWindows);
 
-                            foreach (var overlay in extraWindows)
+                            var activeWindows = new List<JumpscareWindow>(allWindows.Count);
+                            foreach (var window in allWindows)
                             {
+                                if (window.IsClosed) continue;
+
                                 try
                                 {
-                                    overlay.Close();
+                                    window.Show();
+                                    activeWindows.Add(window);
                                 }
                                 catch (InvalidOperationException)
                                 {
                                     // Window may have already closed
                                 }
                             }
-                        }
 
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();
-                        TrimWorkingSet();
+                            try
+                            {
+                                if (activeWindows.Count > 0)
+                                {
+                                    await Task.WhenAll(activeWindows.Select(w => w.PlayAndHide(_frameFrequency)));
+                                }
+                            }
+                            finally
+                            {
+                                try
+                                {
+                                    if (!primaryWindow.IsClosed)
+                                    {
+                                        primaryWindow.Hide();
+                                    }
+                                }
+                                catch (InvalidOperationException)
+                                {
+                                    // Window may have already closed
+                                }
+
+                                foreach (var overlay in extraWindows)
+                                {
+                                    try
+                                    {
+                                        if (!overlay.IsClosed)
+                                        {
+                                            overlay.Close();
+                                        }
+                                    }
+                                    catch (InvalidOperationException)
+                                    {
+                                        // Window may have already closed
+                                    }
+                                }
+                            }
+
+                            GC.Collect();
+                            GC.WaitForPendingFinalizers();
+                            TrimWorkingSet();
+                        }
+                    }
+                    finally
+                    {
+                        _loadLock.Release();
                     }
                 }).Task.Unwrap();
             };
@@ -192,15 +220,25 @@ namespace Desktop
                     ?? _jumpscareManager.GetFirstValidJumpscare();
                 if (selectedJumpscare == null) return;
 
-                if (_jumpscareWindow != null)
+                var oldWindow = Interlocked.Exchange(ref _jumpscareWindow, null);
+                if (oldWindow != null)
                 {
-                    if (_jumpscareWindow.IsPlaying)
+                    if (oldWindow.IsPlaying)
                     {
-                        await _jumpscareWindow.WaitForPlaybackAsync();
+                        await oldWindow.WaitForPlaybackAsync();
                     }
 
-                    _jumpscareWindow.Close();
-                    _jumpscareWindow = null;
+                    if (!oldWindow.IsClosed)
+                    {
+                        try
+                        {
+                            oldWindow.Close();
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            // Window may have already closed
+                        }
+                    }
                 }
 
                 FrameCache frameCache = new FrameCache(
@@ -212,7 +250,7 @@ namespace Desktop
                 _frameFrequency = selectedJumpscare.FrameFrequency;
 
                 await newWindow.PreloadAsync();
-                _jumpscareWindow = newWindow;
+                Interlocked.Exchange(ref _jumpscareWindow, newWindow);
 
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
