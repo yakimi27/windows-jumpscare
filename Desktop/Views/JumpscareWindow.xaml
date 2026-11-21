@@ -6,11 +6,9 @@
         xmlns:local="clr-namespace:Desktop"
         mc:Ignorable="d"
         Title="MainWindow"
-        Height="{x:Static SystemParameters.PrimaryScreenHeight}"
-        Width="{x:Static SystemParameters.PrimaryScreenWidth}"
         AllowsTransparency="True"
         WindowStyle="None"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="Manual"
         Topmost="True"
         ShowInTaskbar="False">
     <Window.Background>

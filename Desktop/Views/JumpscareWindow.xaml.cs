@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Media;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
@@ -10,28 +11,61 @@ namespace Desktop.Views
     public partial class JumpscareWindow : Window
     {
         private readonly FrameCache _cache;
+        private readonly string _assetsPath;
         private readonly string _soundPath;
         private bool _isPlaying = false;
         private bool _isClosed = false;
         private SoundPlayer? _screamSound;
         private bool _isSoundLoaded = false;
+        private System.Drawing.Rectangle? _targetScreenBounds;
         private IReadOnlyList<BitmapImage> _frames = Array.Empty<BitmapImage>();
         private TaskCompletionSource<bool>? _playbackTcs;
 
         internal bool IsPlaying => _isPlaying;
+        internal FrameCache Cache => _cache;
+        internal string AssetsPath => _assetsPath;
 
-        internal JumpscareWindow(FrameCache cache, string assetsPath)
+        internal JumpscareWindow(FrameCache cache, string assetsPath, bool playAudio = true)
         {
             InitializeComponent();
             _cache = cache;
+            _assetsPath = assetsPath;
             Visibility = Visibility.Hidden;
 
             _soundPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
                 $"{assetsPath}/scream.wav");
 
-            if (File.Exists(_soundPath))
+            if (playAudio && File.Exists(_soundPath))
             {
                 _screamSound = new SoundPlayer(_soundPath);
+            }
+        }
+
+        /// <summary>
+        /// Positions and sizes the window to cover the specified monitor,
+        /// translating screen bounds to WPF DIPs using the window's DPI scale.
+        /// </summary>
+        internal void PositionOnScreen(System.Windows.Forms.Screen screen)
+        {
+            _targetScreenBounds = screen.Bounds;
+            ApplyScreenBounds(screen.Bounds, VisualTreeHelper.GetDpi(this));
+        }
+
+        private void ApplyScreenBounds(System.Drawing.Rectangle bounds, DpiScale dpi)
+        {
+            Left = bounds.Left / dpi.DpiScaleX;
+            Top = bounds.Top / dpi.DpiScaleY;
+            Width = bounds.Width / dpi.DpiScaleX;
+            Height = bounds.Height / dpi.DpiScaleY;
+        }
+
+        protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
+        {
+            base.OnDpiChanged(oldDpi, newDpi);
+
+            if (_targetScreenBounds is { } bounds)
+            {
+                ApplyScreenBounds(bounds, newDpi);
             }
         }
 

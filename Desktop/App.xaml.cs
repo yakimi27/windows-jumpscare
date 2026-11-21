@@ -88,21 +88,71 @@ namespace Desktop
                 {
                     if (_jumpscareWindow != null && !_jumpscareWindow.IsPlaying)
                     {
-                        var window = _jumpscareWindow;
-                        window.Show();
+                        var primaryWindow = _jumpscareWindow;
+                        var cursorScreen = System.Windows.Forms.Screen.FromPoint(
+                            System.Windows.Forms.Cursor.Position);
+                        var allScreens = System.Windows.Forms.Screen.AllScreens;
+
+                        primaryWindow.PositionOnScreen(cursorScreen);
+
+                        var extraWindows = new List<JumpscareWindow>();
+                        bool matchedCursorScreen = false;
+                        foreach (var screen in allScreens)
+                        {
+                            if (!matchedCursorScreen && string.Equals(
+                                    screen.DeviceName,
+                                    cursorScreen.DeviceName,
+                                    StringComparison.OrdinalIgnoreCase))
+                            {
+                                matchedCursorScreen = true;
+                                continue;
+                            }
+
+                            var overlay = new JumpscareWindow(
+                                primaryWindow.Cache,
+                                primaryWindow.AssetsPath,
+                                playAudio: false);
+                            await overlay.PreloadAsync();
+                            overlay.PositionOnScreen(screen);
+                            extraWindows.Add(overlay);
+                        }
+
+                        var allWindows = new List<JumpscareWindow>(1 + extraWindows.Count)
+                        {
+                            primaryWindow
+                        };
+                        allWindows.AddRange(extraWindows);
+
+                        foreach (var window in allWindows)
+                        {
+                            window.Show();
+                        }
+
                         try
                         {
-                            await window.PlayAndHide(_frameFrequency);
+                            await Task.WhenAll(allWindows.Select(w => w.PlayAndHide(_frameFrequency)));
                         }
                         finally
                         {
                             try
                             {
-                                window.Hide();
+                                primaryWindow.Hide();
                             }
                             catch (InvalidOperationException)
                             {
                                 // Window may have already closed
+                            }
+
+                            foreach (var overlay in extraWindows)
+                            {
+                                try
+                                {
+                                    overlay.Close();
+                                }
+                                catch (InvalidOperationException)
+                                {
+                                    // Window may have already closed
+                                }
                             }
                         }
 
