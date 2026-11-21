@@ -1,6 +1,7 @@
+using System.Diagnostics;
 using System.IO;
+using System.Media;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
@@ -9,9 +10,11 @@ namespace Desktop.Views
     public partial class JumpscareWindow : Window
     {
         private readonly FrameCache _cache;
+        private readonly string _soundPath;
         private bool _isPlaying = false;
         private bool _isClosed = false;
-        private MediaPlayer _screamSound = new MediaPlayer();
+        private SoundPlayer? _screamSound;
+        private bool _isSoundLoaded = false;
         private IReadOnlyList<BitmapImage> _frames = Array.Empty<BitmapImage>();
         private TaskCompletionSource<bool>? _playbackTcs;
 
@@ -23,13 +26,12 @@ namespace Desktop.Views
             _cache = cache;
             Visibility = Visibility.Hidden;
 
-            var soundPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+            _soundPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
                 $"{assetsPath}/scream.wav");
 
-            if (File.Exists(soundPath))
+            if (File.Exists(_soundPath))
             {
-                _screamSound.Open(new Uri(soundPath));
-                _screamSound.Volume = 0; //muted for priming
+                _screamSound = new SoundPlayer(_soundPath);
             }
         }
 
@@ -44,9 +46,23 @@ namespace Desktop.Views
                 JumpscareImage.Source = _frames[0];
             }
 
-            _screamSound.Play();
-            _screamSound.Stop();
-            _screamSound.Volume = 1.0;
+            await PreloadSoundAsync();
+        }
+
+        private async Task PreloadSoundAsync()
+        {
+            if (_screamSound == null || _isClosed) return;
+
+            try
+            {
+                await Task.Run(() => _screamSound.Load());
+                _isSoundLoaded = true;
+            }
+            catch (Exception ex)
+            {
+                _isSoundLoaded = false;
+                Debug.WriteLine($"Failed to preload scream sound '{_soundPath}': {ex}");
+            }
         }
 
         internal async Task WaitForPlaybackAsync()
@@ -80,7 +96,7 @@ namespace Desktop.Views
                 if (_isClosed) return;
                 Visibility = Visibility.Visible;
 
-                _ = PlaySound();
+                PlaySound();
 
                 foreach (var frame in _frames)
                 {
@@ -106,11 +122,25 @@ namespace Desktop.Views
             }
         }
 
-        private async Task PlaySound()
+        private void PlaySound()
         {
-            _screamSound.Position = TimeSpan.FromMilliseconds(1);
-            _screamSound.Position = TimeSpan.Zero;
-            _screamSound.Play();
+            if (_screamSound == null || _isClosed) return;
+
+            try
+            {
+                if (!_isSoundLoaded)
+                {
+                    _screamSound.Load();
+                    _isSoundLoaded = true;
+                }
+
+                _screamSound.Play();
+            }
+            catch (Exception ex)
+            {
+                _isSoundLoaded = false;
+                Debug.WriteLine($"Failed to play scream sound '{_soundPath}': {ex}");
+            }
         }
 
         protected override void OnClosed(EventArgs e)
@@ -119,8 +149,24 @@ namespace Desktop.Views
             _isClosed = true;
             _isPlaying = false;
             _playbackTcs?.TrySetResult(true);
-            _screamSound.Stop();
-            _screamSound.Close();
+
+            if (_screamSound != null)
+            {
+                try
+                {
+                    _screamSound.Stop();
+                    _screamSound.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Failed to dispose scream sound '{_soundPath}': {ex}");
+                }
+                finally
+                {
+                    _screamSound = null;
+                    _isSoundLoaded = false;
+                }
+            }
         }
     }
 }
