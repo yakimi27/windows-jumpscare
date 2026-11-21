@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet" alt=".NET 10" /></a>
+  <a href="https://dotnet.microsoft.com/download/dotnet/11.0"><img src="https://img.shields.io/badge/.NET-11.0-512BD4?logo=dotnet" alt=".NET 11" /></a>
   <a href="https://learn.microsoft.com/en-us/dotnet/desktop/wpf/"><img src="https://img.shields.io/badge/Platform-Windows%2010%20%2F%2011-0078D6?logo=windows" alt="Platform: Windows" /></a>
   <a href="https://jrsoftware.org/isinfo.php"><img src="https://img.shields.io/badge/Installer-Inno%20Setup-orange" alt="Inno Setup" /></a>
   <a href="https://github.com/yakimi27/windows-jumpscare"><img src="https://img.shields.io/badge/Roster-17%20Characters-red" alt="17 Characters" /></a>
@@ -31,8 +31,8 @@ Choose the distribution format that best fits your needs:
 | Package | Type | Prerequisites | Description |
 |:---|:---:|:---:|:---|
 | **[WindowsJumpscare-Setup.exe](https://github.com/yakimi27/windows-jumpscare/releases)** | **Installer** | *None* | **Recommended.** Guided setup wizard, creates Start Menu shortcuts and optional Desktop icon, includes full uninstaller. |
-| **[WindowsJumpscare-SelfContained.zip](https://github.com/yakimi27/windows-jumpscare/releases)** | **Portable** | *None* | Standalone portable bundle. Pre-packaged with the .NET 10 runtime — extract and run anywhere without installing anything. |
-| **[WindowsJumpscare-FrameworkDependent.zip](https://github.com/yakimi27/windows-jumpscare/releases)** | **Portable (Lightweight)** | [.NET 10 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/10.0) | Minimal file size download for users who already have .NET 10 installed on their system. |
+| **[WindowsJumpscare-SelfContained.zip](https://github.com/yakimi27/windows-jumpscare/releases)** | **Portable** | *None* | Standalone portable bundle. Pre-packaged with the .NET 11 runtime — extract and run anywhere without installing anything. |
+| **[WindowsJumpscare-FrameworkDependent.zip](https://github.com/yakimi27/windows-jumpscare/releases)** | **Portable (Lightweight)** | [.NET 11 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/11.0) | Minimal file size download for users who already have .NET 11 installed on their system. |
 
 ---
 
@@ -133,7 +133,7 @@ Desktop/Assets/custom_monster/
 
 ```
 windows-jumpscare/
-├── Core/                   # Decoupled .NET 10 class library
+├── Core/                   # Decoupled .NET 11 class library
 │   ├── ConfigModels/       # Models for user config and jumpscare configurations
 │   ├── Interfaces/         # Contracts for managers and config services
 │   ├── Managers/           # Logic for Autostart, Jumpscares, and User preferences
@@ -155,7 +155,7 @@ windows-jumpscare/
 
 ### Prerequisites
 - Windows 10 or 11 (x64)
-- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
+- [.NET 11.0 SDK](https://dotnet.microsoft.com/download/dotnet/11.0)
 
 ### 1. Build & Run Locally
 ```bash
