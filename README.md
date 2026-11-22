@@ -45,6 +45,7 @@ Choose the distribution format that best fits your needs:
   - **Live Animated Preview**: Real-time thumbnail preview cycling through animation frames directly inside the settings window.
   - **Adjustable Frequency**: Slider ranging from *Rare* (1 in 1,000,000 chance every 3s) to *Frequent* (1 in ~250,000 chance every 3s).
   - **Instant Trigger Button**: Quick `⚡ Test Jumpscare` button for instant pranks and testing.
+- **Global Debug Shortcut**: Press `Ctrl + Shift + J` anywhere in Windows when running a `Debug` build to trigger a jumpscare immediately.
 - **Windows Autostart Integration**: One-click toggle switch to register or unregister the app in Windows Startup registry (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run`).
 - **Near-Zero Memory Footprint**: Uses pre-cached bitmap frames, aggressive garbage collection, and Win32 working-set memory trimming (`SetProcessWorkingSetSize`) to idle at negligible RAM usage.
 - **Fully Extensible via JSON**: Add custom creatures, custom image sequences, frame rates, and sound effects via simple JSON configuration.
@@ -91,7 +92,7 @@ The application runs an asynchronous timer that rolls for a jumpscare every **3 
 | **Frequent** | `4` | `1 in 249,635` | ~8.6 days of continuous runtime |
 
 > [!TIP]
-> You never have to wait for random chance to see a jumpscare — trigger one immediately at any time via the **`⚡ Test Jumpscare`** button in Settings or by right-clicking the tray icon and selecting **`Trigger jumpscare`**.
+> You never have to wait for random chance to see a jumpscare — trigger one immediately at any time via the **`⚡ Test Jumpscare`** button in Settings, by right-clicking the tray icon and selecting **`Trigger jumpscare`**, or by pressing **`Ctrl + Shift + J`** anywhere in Windows (in `Debug` builds).
 
 ---
 
@@ -163,8 +164,11 @@ windows-jumpscare/
 git clone https://github.com/yakimi27/windows-jumpscare.git
 cd windows-jumpscare
 
-# Restore and run
+# Restore and run (Release)
 dotnet run --project Desktop/Desktop.csproj -c Release
+
+# Run in Debug mode (enables global Ctrl + Shift + J trigger shortcut)
+dotnet run --project Desktop/Desktop.csproj -c Debug
 ```
 
 ### 2. Publish Self-Contained Release (Embedded .NET Runtime)
