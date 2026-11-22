@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Windows.Media.Imaging;
 
 namespace Desktop
@@ -20,11 +21,16 @@ namespace Desktop
         {
             if (_frames != null) return _frames;
 
-            _frames = new List<BitmapImage>();
+            var frames = new List<BitmapImage>();
             for (int i = 1; i <= _frameQuantity; i++)
             {
-                _frames.Add(CreateFrame(i));
+                var frame = CreateFrame(i);
+                if (frame != null)
+                {
+                    frames.Add(frame);
+                }
             }
+            _frames = frames;
             return _frames;
         }
 
@@ -37,24 +43,37 @@ namespace Desktop
                 var frames = new List<BitmapImage>();
                 for (int i = 1; i <= _frameQuantity; i++)
                 {
-                    frames.Add(CreateFrame(i));
+                    var frame = CreateFrame(i);
+                    if (frame != null)
+                    {
+                        frames.Add(frame);
+                    }
                 }
                 _frames = frames;
             });
         }
 
-        private BitmapImage CreateFrame(int index)
+        private BitmapImage? CreateFrame(int index)
         {
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.UriSource = new Uri($"pack://application:,,,/{_entityAssetsPath}/{index}.png");
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.CreateOptions = BitmapCreateOptions.None;
-            if (_decodeWidth.HasValue)
-                bitmap.DecodePixelWidth = _decodeWidth.Value;
-            bitmap.EndInit();
-            bitmap.Freeze();
-            return bitmap;
+            try
+            {
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri($"pack://application:,,,/{_entityAssetsPath}/{index}.png");
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.CreateOptions = BitmapCreateOptions.None;
+                if (_decodeWidth.HasValue)
+                    bitmap.DecodePixelWidth = _decodeWidth.Value;
+                bitmap.EndInit();
+                bitmap.Freeze();
+                return bitmap;
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError($"Failed to load frame {index} from '{_entityAssetsPath}': {ex}");
+                Debug.WriteLine($"Failed to load frame {index} from '{_entityAssetsPath}': {ex}");
+                return null;
+            }
         }
 
         public void Release()
