@@ -1,7 +1,9 @@
 using Microsoft.Win32;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Runtime.Versioning;
+using System.Security;
 
 namespace Core.Managers
 {
@@ -15,24 +17,32 @@ namespace Core.Managers
         {
             if (!OperatingSystem.IsWindows()) return;
 
-            using var key = Registry.CurrentUser.CreateSubKey(RunKey, writable: true);
-            if (key == null) return;
-
-            if (enable)
+            try
             {
-                string? exePath = Environment.ProcessPath;
+                using var key = Registry.CurrentUser.CreateSubKey(RunKey, writable: true);
+                if (key == null) return;
 
-                if (!string.IsNullOrEmpty(exePath))
+                if (enable)
                 {
-                    key.SetValue(AppName, $"\"{exePath}\"");
+                    string? exePath = Environment.ProcessPath;
+
+                    if (!string.IsNullOrEmpty(exePath))
+                    {
+                        key.SetValue(AppName, $"\"{exePath}\"");
+                    }
+                }
+                else
+                {
+                    if (key.GetValue(AppName) != null)
+                    {
+                        key.DeleteValue(AppName, throwOnMissingValue: false);
+                    }
                 }
             }
-            else
+            catch (Exception ex) when (ex is SecurityException or UnauthorizedAccessException or IOException)
             {
-                if (key.GetValue(AppName) != null)
-                {
-                    key.DeleteValue(AppName, throwOnMissingValue: false);
-                }
+                Trace.TraceError($"Failed to set autostart to {enable} in registry: {ex}");
+                Debug.WriteLine($"Failed to set autostart to {enable} in registry: {ex}");
             }
         }
 
@@ -40,8 +50,17 @@ namespace Core.Managers
         {
             if (!OperatingSystem.IsWindows()) return false;
 
-            using var key = Registry.CurrentUser.OpenSubKey(RunKey, writable: false);
-            return key?.GetValue(AppName) != null;
+            try
+            {
+                using var key = Registry.CurrentUser.OpenSubKey(RunKey, writable: false);
+                return key?.GetValue(AppName) != null;
+            }
+            catch (Exception ex) when (ex is SecurityException or UnauthorizedAccessException or IOException)
+            {
+                Trace.TraceError($"Failed to read autostart state from registry: {ex}");
+                Debug.WriteLine($"Failed to read autostart state from registry: {ex}");
+                return false;
+            }
         }
     }
 }
