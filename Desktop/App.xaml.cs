@@ -426,6 +426,10 @@ namespace Desktop
                 };
             }
             _settingsWindow.Show();
+            if (_settingsWindow.WindowState == WindowState.Minimized)
+            {
+                _settingsWindow.WindowState = WindowState.Normal;
+            }
             _settingsWindow.Activate();
         }
     }
