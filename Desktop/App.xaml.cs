@@ -2,9 +2,11 @@ using Core;
 using Core.Interfaces;
 using Core.Managers;
 using Core.Services;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
+using System.Windows.Threading;
 using Desktop.Views;
 
 
@@ -12,7 +14,7 @@ namespace Desktop
 {
     public partial class App : System.Windows.Application
     {
-        private readonly IConfigService _configService = new ConfigService();
+        private IConfigService _configService = null!;
         private IUserManager _userManager = null!;
         private IJumpscareManager _jumpscareManager = null!;
         private Loop _loop = new Loop();
@@ -51,168 +53,230 @@ namespace Desktop
 
         protected override async void OnStartup(StartupEventArgs e)
         {
+            DispatcherUnhandledException += OnDispatcherUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += OnCurrentDomainUnhandledException;
+
             base.OnStartup(e);
 
-            using var iconStream = GetResourceStream(
-                new Uri("pack://application:,,,/windowsJumpscare.ico")
-            )?.Stream;
-
-            _trayIcon = new NotifyIcon
+            try
             {
-                Icon = iconStream != null ? new System.Drawing.Icon(iconStream) : null,
-                Visible = true,
-                Text = "Windows Jumpscare"
-            };
+                _configService = new ConfigService();
 
-            var contextMenu = new ContextMenuStrip();
-            contextMenu.Items.Add("Show", null, (s, args) => ShowMainWindow());
-            contextMenu.Items.Add("Trigger jumpscare", null, onClick: async (s, args) =>
-            {
+                System.Drawing.Icon? trayIconImage = null;
                 try
                 {
-                    await _loop.Trigger();
+                    using var iconStream = GetResourceStream(
+                        new Uri("pack://application:,,,/windowsJumpscare.ico")
+                    )?.Stream;
+                    if (iconStream != null)
+                    {
+                        trayIconImage = new System.Drawing.Icon(iconStream);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"Error triggering jumpscare from tray: {ex}");
+                    LogException("Failed to load tray icon resource", ex);
                 }
-            });
-            contextMenu.Items.Add("Exit", null, (s, args) => Shutdown());
-            _trayIcon.ContextMenuStrip = contextMenu;
-            _trayIcon.DoubleClick += (s, args) => ShowMainWindow();
 
-            _userManager = new UserManager(_configService);
-            _jumpscareManager = new JumpscareManager(_configService);
-
-            var currentJumpscare = _userManager.GetSelectedJumpscare();
-            if (_jumpscareManager.GetByName(currentJumpscare) == null)
-            {
-                var fallback = _jumpscareManager.GetFirstValidJumpscare();
-                if (fallback != null)
+                _trayIcon = new NotifyIcon
                 {
-                    _userManager.SetSelectedJumpscare(fallback.Name);
-                }
-            }
+                    Icon = trayIconImage,
+                    Visible = true,
+                    Text = "Windows Jumpscare"
+                };
 
-            _userManager.JumpscareChanged += OnJumpscareChanged;
-            _userManager.JumpscareChanceChanged += OnJumpscareChanceChanged;
-
-            await LoadJumpscareAsync(_userManager.GetSelectedJumpscare());
-
-            _loop.OnTriggered += () =>
-            {
-                return Dispatcher.InvokeAsync(async () =>
+                var contextMenu = new ContextMenuStrip();
+                contextMenu.Items.Add("Show", null, (s, args) => ShowMainWindow());
+                contextMenu.Items.Add("Trigger jumpscare", null, onClick: async (s, args) =>
                 {
-                    await _loadLock.WaitAsync();
                     try
                     {
-                        var primaryWindow = Volatile.Read(ref _jumpscareWindow);
-                        if (primaryWindow != null && !primaryWindow.IsPlaying && !primaryWindow.IsClosed)
+                        await _loop.Trigger();
+                    }
+                    catch (Exception ex)
+                    {
+                        LogException("Error triggering jumpscare from tray", ex);
+                    }
+                });
+                contextMenu.Items.Add("Exit", null, (s, args) => Shutdown());
+                _trayIcon.ContextMenuStrip = contextMenu;
+                _trayIcon.DoubleClick += (s, args) => ShowMainWindow();
+
+                _userManager = new UserManager(_configService);
+                _jumpscareManager = new JumpscareManager(_configService);
+
+                var currentJumpscare = _userManager.GetSelectedJumpscare();
+                if (_jumpscareManager.GetByName(currentJumpscare) == null)
+                {
+                    var fallback = _jumpscareManager.GetFirstValidJumpscare();
+                    if (fallback != null)
+                    {
+                        _userManager.SetSelectedJumpscare(fallback.Name);
+                    }
+                }
+
+                _userManager.JumpscareChanged += OnJumpscareChanged;
+                _userManager.JumpscareChanceChanged += OnJumpscareChanceChanged;
+
+                try
+                {
+                    await LoadJumpscareAsync(_userManager.GetSelectedJumpscare());
+                }
+                catch (Exception ex)
+                {
+                    LogException("Failed to load initial jumpscare during startup", ex);
+                }
+
+                _loop.OnTriggered += () =>
+                {
+                    return Dispatcher.InvokeAsync(async () =>
+                    {
+                        await _loadLock.WaitAsync();
+                        try
                         {
-                            var cursorScreen = System.Windows.Forms.Screen.FromPoint(
-                                System.Windows.Forms.Cursor.Position);
-                            var allScreens = System.Windows.Forms.Screen.AllScreens;
-
-                            primaryWindow.PositionOnScreen(cursorScreen);
-
-                            var extraWindows = new List<JumpscareWindow>();
-                            bool matchedCursorScreen = false;
-                            foreach (var screen in allScreens)
+                            var primaryWindow = Volatile.Read(ref _jumpscareWindow);
+                            if (primaryWindow != null && !primaryWindow.IsPlaying && !primaryWindow.IsClosed)
                             {
-                                if (!matchedCursorScreen && string.Equals(
-                                        screen.DeviceName,
-                                        cursorScreen.DeviceName,
-                                        StringComparison.OrdinalIgnoreCase))
-                                {
-                                    matchedCursorScreen = true;
-                                    continue;
-                                }
+                                var cursorScreen = System.Windows.Forms.Screen.FromPoint(
+                                    System.Windows.Forms.Cursor.Position);
+                                var allScreens = System.Windows.Forms.Screen.AllScreens;
 
-                                var overlay = new JumpscareWindow(
-                                    primaryWindow.Cache,
-                                    primaryWindow.AssetsPath,
-                                    playAudio: false);
-                                await overlay.PreloadAsync();
-                                overlay.PositionOnScreen(screen);
-                                extraWindows.Add(overlay);
-                            }
+                                primaryWindow.PositionOnScreen(cursorScreen);
 
-                            var allWindows = new List<JumpscareWindow>(1 + extraWindows.Count)
-                            {
-                                primaryWindow
-                            };
-                            allWindows.AddRange(extraWindows);
-
-                            var activeWindows = new List<JumpscareWindow>(allWindows.Count);
-                            foreach (var window in allWindows)
-                            {
-                                if (window.IsClosed) continue;
-
-                                try
+                                var extraWindows = new List<JumpscareWindow>();
+                                bool matchedCursorScreen = false;
+                                foreach (var screen in allScreens)
                                 {
-                                    window.Show();
-                                    activeWindows.Add(window);
-                                }
-                                catch (InvalidOperationException)
-                                {
-                                    // Window may have already closed
-                                }
-                            }
-
-                            try
-                            {
-                                if (activeWindows.Count > 0)
-                                {
-                                    await Task.WhenAll(activeWindows.Select(w => w.PlayAndHide(_frameFrequency)));
-                                }
-                            }
-                            finally
-                            {
-                                try
-                                {
-                                    if (!primaryWindow.IsClosed)
+                                    if (!matchedCursorScreen && string.Equals(
+                                            screen.DeviceName,
+                                            cursorScreen.DeviceName,
+                                            StringComparison.OrdinalIgnoreCase))
                                     {
-                                        primaryWindow.Hide();
+                                        matchedCursorScreen = true;
+                                        continue;
                                     }
-                                }
-                                catch (InvalidOperationException)
-                                {
-                                    // Window may have already closed
+
+                                    var overlay = new JumpscareWindow(
+                                        primaryWindow.Cache,
+                                        primaryWindow.AssetsPath,
+                                        playAudio: false);
+                                    await overlay.PreloadAsync();
+                                    overlay.PositionOnScreen(screen);
+                                    extraWindows.Add(overlay);
                                 }
 
-                                foreach (var overlay in extraWindows)
+                                var allWindows = new List<JumpscareWindow>(1 + extraWindows.Count)
                                 {
+                                    primaryWindow
+                                };
+                                allWindows.AddRange(extraWindows);
+
+                                var activeWindows = new List<JumpscareWindow>(allWindows.Count);
+                                foreach (var window in allWindows)
+                                {
+                                    if (window.IsClosed) continue;
+
                                     try
                                     {
-                                        if (!overlay.IsClosed)
-                                        {
-                                            overlay.Close();
-                                        }
+                                        window.Show();
+                                        activeWindows.Add(window);
                                     }
                                     catch (InvalidOperationException)
                                     {
                                         // Window may have already closed
                                     }
                                 }
+
+                                try
+                                {
+                                    if (activeWindows.Count > 0)
+                                    {
+                                        await Task.WhenAll(activeWindows.Select(w => w.PlayAndHide(_frameFrequency)));
+                                    }
+                                }
+                                finally
+                                {
+                                    try
+                                    {
+                                        if (!primaryWindow.IsClosed)
+                                        {
+                                            primaryWindow.Hide();
+                                        }
+                                    }
+                                    catch (InvalidOperationException)
+                                    {
+                                        // Window may have already closed
+                                    }
+
+                                    foreach (var overlay in extraWindows)
+                                    {
+                                        try
+                                        {
+                                            if (!overlay.IsClosed)
+                                            {
+                                                overlay.Close();
+                                            }
+                                        }
+                                        catch (InvalidOperationException)
+                                        {
+                                            // Window may have already closed
+                                        }
+                                    }
+                                }
+
+                                GC.Collect();
+                                GC.WaitForPendingFinalizers();
+                                TrimWorkingSet();
                             }
-
-                            GC.Collect();
-                            GC.WaitForPendingFinalizers();
-                            TrimWorkingSet();
                         }
-                    }
-                    finally
-                    {
-                        _loadLock.Release();
-                    }
-                }).Task.Unwrap();
-            };
+                        finally
+                        {
+                            _loadLock.Release();
+                        }
+                    }).Task.Unwrap();
+                };
 
-            _ = _loop.StartAsync(_userManager.GetJumpscareChance());
+                _ = _loop.StartAsync(_userManager.GetJumpscareChance());
 
 #if DEBUG
-            RegisterDebugHotkey();
+                RegisterDebugHotkey();
 #endif
+            }
+            catch (Exception ex)
+            {
+                LogException("Fatal error during application startup", ex);
+                System.Windows.MessageBox.Show(
+                    $"Windows Jumpscare encountered a fatal startup error:\n\n{ex.Message}",
+                    "Windows Jumpscare - Startup Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                Shutdown(1);
+            }
+        }
+
+        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            LogException("Unhandled dispatcher exception", e.Exception);
+            e.Handled = true;
+        }
+
+        private void OnCurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            if (e.ExceptionObject is Exception ex)
+            {
+                LogException("Unhandled AppDomain exception", ex);
+            }
+            else
+            {
+                Trace.TraceError($"Unhandled AppDomain non-Exception object: {e.ExceptionObject}");
+                Debug.WriteLine($"Unhandled AppDomain non-Exception object: {e.ExceptionObject}");
+            }
+        }
+
+        private static void LogException(string context, Exception ex)
+        {
+            Trace.TraceError($"{context}: {ex}");
+            Debug.WriteLine($"{context}: {ex}");
         }
 
         private async void OnJumpscareChanged(string jumpscareName)
@@ -223,7 +287,7 @@ namespace Desktop
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Failed to load jumpscare '{jumpscareName}': {ex.Message}");
+                LogException($"Failed to load jumpscare '{jumpscareName}'", ex);
             }
         }
 
@@ -285,6 +349,9 @@ namespace Desktop
 
         protected override void OnExit(ExitEventArgs e)
         {
+            DispatcherUnhandledException -= OnDispatcherUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException -= OnCurrentDomainUnhandledException;
+
             base.OnExit(e);
 #if DEBUG
             UnregisterDebugHotkey();
