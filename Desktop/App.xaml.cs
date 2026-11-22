@@ -4,6 +4,7 @@ using Core.Managers;
 using Core.Services;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Interop;
 using Desktop.Views;
 
 
@@ -20,6 +21,22 @@ namespace Desktop
         private SettingsWindow? _settingsWindow;
         private ushort _frameFrequency;
         private readonly SemaphoreSlim _loadLock = new SemaphoreSlim(1, 1);
+
+#if DEBUG
+        private HwndSource? _hotkeyHwndSource;
+        private const int DebugHotkeyId = 9001;
+        private const int WmHotkey = 0x0312;
+        private const uint ModControl = 0x0002;
+        private const uint ModShift = 0x0004;
+        private const uint ModNoRepeat = 0x4000;
+        private const uint VkJ = 0x4A;
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool RegisterHotKey(IntPtr hWnd, int id, uint fsModifiers, uint vk);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern bool UnregisterHotKey(IntPtr hWnd, int id);
+#endif
 
         [DllImport("kernel32.dll")]
         private static extern bool SetProcessWorkingSetSize(IntPtr handle, IntPtr minSize, IntPtr maxSize);
@@ -192,6 +209,10 @@ namespace Desktop
             };
 
             _ = _loop.StartAsync(_userManager.GetJumpscareChance());
+
+#if DEBUG
+            RegisterDebugHotkey();
+#endif
         }
 
         private async void OnJumpscareChanged(string jumpscareName)
@@ -265,8 +286,64 @@ namespace Desktop
         protected override void OnExit(ExitEventArgs e)
         {
             base.OnExit(e);
+#if DEBUG
+            UnregisterDebugHotkey();
+#endif
             _trayIcon?.Dispose();
         }
+
+#if DEBUG
+        private void RegisterDebugHotkey()
+        {
+            var parameters = new HwndSourceParameters("WindowsJumpscareDebugHotkeySink")
+            {
+                Width = 0,
+                Height = 0,
+                WindowStyle = 0
+            };
+
+            _hotkeyHwndSource = new HwndSource(parameters);
+            _hotkeyHwndSource.AddHook(HotkeyWndProc);
+
+            if (!RegisterHotKey(_hotkeyHwndSource.Handle, DebugHotkeyId, ModControl | ModShift | ModNoRepeat, VkJ))
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to register debug hotkey Ctrl+Shift+J (Win32 error: {Marshal.GetLastWin32Error()})");
+            }
+        }
+
+        private void UnregisterDebugHotkey()
+        {
+            if (_hotkeyHwndSource != null)
+            {
+                UnregisterHotKey(_hotkeyHwndSource.Handle, DebugHotkeyId);
+                _hotkeyHwndSource.RemoveHook(HotkeyWndProc);
+                _hotkeyHwndSource.Dispose();
+                _hotkeyHwndSource = null;
+            }
+        }
+
+        private IntPtr HotkeyWndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+        {
+            if (msg == WmHotkey && wParam.ToInt32() == DebugHotkeyId)
+            {
+                handled = true;
+                _ = TriggerFromDebugHotkeyAsync();
+            }
+            return IntPtr.Zero;
+        }
+
+        private async Task TriggerFromDebugHotkeyAsync()
+        {
+            try
+            {
+                await _loop.Trigger();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error triggering jumpscare from debug hotkey: {ex}");
+            }
+        }
+#endif
 
         private void ShowMainWindow()
         {
