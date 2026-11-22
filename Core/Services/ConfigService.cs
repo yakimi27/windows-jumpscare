@@ -15,6 +15,7 @@ namespace Core.Services
         private readonly string _appDirectory;
         private readonly string _userConfigFilePath;
         private readonly string _jumpscareConfigFilePath;
+        private readonly object _fileLock = new();
 
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {
@@ -36,73 +37,79 @@ namespace Core.Services
 
         public T? Load<T>(string filePath) where T : new()
         {
-            try
+            lock (_fileLock)
             {
-                var json = File.ReadAllText(filePath);
-                return JsonSerializer.Deserialize<T>(json, _jsonOptions) ?? new T();
-            }
-            catch (FileNotFoundException ex)
-            {
-                Trace.TraceError($"Config file not found at '{filePath}': {ex}");
-                Debug.WriteLine($"Config file not found at '{filePath}': {ex}");
-                return new T();
-            }
-            catch (IOException ex)
-            {
-                Trace.TraceError($"IO error reading config file at '{filePath}': {ex}");
-                Debug.WriteLine($"IO error reading config file at '{filePath}': {ex}");
-                return new T();
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                Trace.TraceError($"Access denied reading config file at '{filePath}': {ex}");
-                Debug.WriteLine($"Access denied reading config file at '{filePath}': {ex}");
-                return new T();
-            }
-            catch (JsonException ex)
-            {
-                Trace.TraceError($"JSON deserialization error in config file at '{filePath}': {ex}");
-                Debug.WriteLine($"JSON deserialization error in config file at '{filePath}': {ex}");
-                return new T();
+                try
+                {
+                    var json = File.ReadAllText(filePath);
+                    return JsonSerializer.Deserialize<T>(json, _jsonOptions) ?? new T();
+                }
+                catch (FileNotFoundException ex)
+                {
+                    Trace.TraceError($"Config file not found at '{filePath}': {ex}");
+                    Debug.WriteLine($"Config file not found at '{filePath}': {ex}");
+                    return new T();
+                }
+                catch (IOException ex)
+                {
+                    Trace.TraceError($"IO error reading config file at '{filePath}': {ex}");
+                    Debug.WriteLine($"IO error reading config file at '{filePath}': {ex}");
+                    return new T();
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    Trace.TraceError($"Access denied reading config file at '{filePath}': {ex}");
+                    Debug.WriteLine($"Access denied reading config file at '{filePath}': {ex}");
+                    return new T();
+                }
+                catch (JsonException ex)
+                {
+                    Trace.TraceError($"JSON deserialization error in config file at '{filePath}': {ex}");
+                    Debug.WriteLine($"JSON deserialization error in config file at '{filePath}': {ex}");
+                    return new T();
+                }
             }
         }
 
         public void Save<T>(string filePath, T data)
         {
-            var tempPath = filePath + ".tmp";
-            try
+            lock (_fileLock)
             {
-                var json = JsonSerializer.Serialize(data, _jsonOptions);
-                File.WriteAllText(tempPath, json);
-                File.Move(tempPath, filePath, overwrite: true);
-            }
-            catch (IOException ex)
-            {
-                Trace.TraceError($"IO error writing config file at '{filePath}': {ex}");
-                Debug.WriteLine($"IO error writing config file at '{filePath}': {ex}");
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                Trace.TraceError($"Access denied writing config file at '{filePath}': {ex}");
-                Debug.WriteLine($"Access denied writing config file at '{filePath}': {ex}");
-            }
-            catch (JsonException ex)
-            {
-                Trace.TraceError($"JSON serialization error in config file at '{filePath}': {ex}");
-                Debug.WriteLine($"JSON serialization error in config file at '{filePath}': {ex}");
-            }
-            finally
-            {
+                var tempPath = $"{filePath}.{Guid.NewGuid():N}.tmp";
                 try
                 {
-                    if (File.Exists(tempPath))
-                    {
-                        File.Delete(tempPath);
-                    }
+                    var json = JsonSerializer.Serialize(data, _jsonOptions);
+                    File.WriteAllText(tempPath, json);
+                    File.Move(tempPath, filePath, overwrite: true);
                 }
-                catch
+                catch (IOException ex)
                 {
-                    // ignore errors during temp file cleanup
+                    Trace.TraceError($"IO error writing config file at '{filePath}': {ex}");
+                    Debug.WriteLine($"IO error writing config file at '{filePath}': {ex}");
+                }
+                catch (UnauthorizedAccessException ex)
+                {
+                    Trace.TraceError($"Access denied writing config file at '{filePath}': {ex}");
+                    Debug.WriteLine($"Access denied writing config file at '{filePath}': {ex}");
+                }
+                catch (JsonException ex)
+                {
+                    Trace.TraceError($"JSON serialization error in config file at '{filePath}': {ex}");
+                    Debug.WriteLine($"JSON serialization error in config file at '{filePath}': {ex}");
+                }
+                finally
+                {
+                    try
+                    {
+                        if (File.Exists(tempPath))
+                        {
+                            File.Delete(tempPath);
+                        }
+                    }
+                    catch
+                    {
+                        // ignore errors during temp file cleanup
+                    }
                 }
             }
         }
