@@ -62,16 +62,19 @@ namespace Core
 
         public async Task Trigger()
         {
-            if (OnTriggered != null)
+            var handler = OnTriggered;
+            if (handler is null)
             {
-                var delegates = OnTriggered.GetInvocationList();
-                var tasks = new Task[delegates.Length];
-                for (int i = 0; i < delegates.Length; i++)
-                {
-                    tasks[i] = ((Func<Task>)delegates[i])() ?? Task.CompletedTask;
-                }
-                await Task.WhenAll(tasks);
+                return;
             }
+
+            var delegates = handler.GetInvocationList();
+            var tasks = new Task[delegates.Length];
+            for (int i = 0; i < delegates.Length; i++)
+            {
+                tasks[i] = ((Func<Task>)delegates[i])() ?? Task.CompletedTask;
+            }
+            await Task.WhenAll(tasks);
         }
     }
 }
