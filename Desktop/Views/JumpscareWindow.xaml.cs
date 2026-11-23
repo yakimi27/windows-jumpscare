@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using System.IO;
 using System.Media;
+using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
@@ -10,6 +12,23 @@ namespace Desktop.Views
 {
     public partial class JumpscareWindow : Window
     {
+        private static readonly IntPtr HWND_TOPMOST = new(-1);
+        private const uint SWP_NOSIZE = 0x0001;
+        private const uint SWP_NOMOVE = 0x0002;
+        private const uint SWP_NOACTIVATE = 0x0010;
+        private const uint SWP_SHOWWINDOW = 0x0040;
+
+        [DllImport("user32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool SetWindowPos(
+            IntPtr hWnd,
+            IntPtr hWndInsertAfter,
+            int X,
+            int Y,
+            int cx,
+            int cy,
+            uint uFlags);
+
         private readonly FrameCache _cache;
         private readonly string _assetsPath;
         private readonly string _soundPath;
@@ -130,6 +149,7 @@ namespace Desktop.Views
 
                 if (_isClosed) return;
                 Visibility = Visibility.Visible;
+                BringToFront();
 
                 PlaySound();
 
@@ -154,6 +174,27 @@ namespace Desktop.Views
             {
                 _isPlaying = false;
                 _playbackTcs?.TrySetResult(true);
+            }
+        }
+
+        private void BringToFront()
+        {
+            var hwnd = new WindowInteropHelper(this).Handle;
+            if (hwnd != IntPtr.Zero)
+            {
+                SetWindowPos(
+                    hwnd,
+                    HWND_TOPMOST,
+                    0,
+                    0,
+                    0,
+                    0,
+                    SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOACTIVATE);
+            }
+
+            if (!Topmost)
+            {
+                Topmost = true;
             }
         }
 
